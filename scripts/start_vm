@@ -1,0 +1,38 @@
+#!/bin/bash
+if [[ $# -ne 2 ]]
+then
+	echo "$0 <name> <namespace>"
+	exit 1
+fi
+NAME=$1
+NS=$2
+
+if ! [[ $NAME =~ ^[a-z][-0-9a-z]*$ ]]
+then
+	echo "$NAME is wrong"
+	exit 1
+fi
+
+if ! [[ $NS =~ ^[0-9a-f]+$ ]]
+then
+	echo "namespace is wrong"
+	exit 1
+fi
+if [[ ! -d ~/.vm/namespace/$NS ]]
+then
+	echo "NO NAMESPACE"
+	exit 12
+fi
+[[ ! -d ~/.vm/namespace/$NS/vm ]] && mkdir ~/.vm/namespace/$NS/vm 
+if [[ -L ~/.vm/namespace/$NS/vm/$NAME ]]
+then
+	(
+		flock -n 10 || exit 1
+		/usr/bin/lxc start $NAME
+		rm ~/.vm/namespace/$NS/vm/$NAME.tmp
+	
+	) 10>>~/.vm/namespace/$NS/vm/$NAME.tmp
+else
+	echo "VM IS NOT AVAILIBLE"
+	exit 10
+fi

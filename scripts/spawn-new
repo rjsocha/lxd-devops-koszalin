@@ -1,0 +1,35 @@
+#!/bin/bash
+if [[ $# -ne 1 ]]
+then
+	echo "$0 <name>"
+	exit 1
+fi
+NAME=$1
+
+if ! [[ $NAME =~ ^[a-z][-0-9a-z]*$ ]]
+then
+	echo "$NAME is wrong"
+	exit 1
+fi
+pass=$(/usr/bin/pwgen -B 8 1)
+
+if [[ ! -f ~/.vm/pool/$NAME ]]
+then
+	(
+		flock -n 10 || exit 1
+		/usr/bin/lxc launch --profile ubuntu ubuntu-devops $NAME 2>&1
+		if [[ $? -ne 0 ]]
+		then
+			rm ~/.vm/pool/$NAME.tmp
+			exit 15
+		fi
+		echo "ubuntu:$pass" | /usr/bin/lxc exec $NAME chpasswd 
+		echo "LXD_PASS=$pass" >~/.vm/pool/$NAME.tmp
+		mv ~/.vm/pool/$NAME.tmp ~/.vm/pool/$NAME
+		ln -s ~/.vm/pool/$NAME ~/.vm/free/$NAME
+		
+	) 10>>~/.vm/pool/$NAME.tmp
+else
+	exit 10
+fi
+

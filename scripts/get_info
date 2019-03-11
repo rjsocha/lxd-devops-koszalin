@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [[ $# -ne 1 ]]
+then
+	exit 1
+fi
+NAME=$1
+
+if ! [[ $NAME =~ ^[a-z][-0-9a-z]*$ ]]
+then
+	exit 1
+fi
+if [[  -f ~/.vm/pool/$NAME ]]
+then
+	/usr/bin/lxc list  --format json $NAME 
+else
+	exit 10
+fi
+
