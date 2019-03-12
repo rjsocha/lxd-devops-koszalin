@@ -26,7 +26,7 @@ function wrn($w) {
 	}
 	$opass = md5($_REQUEST['opassword']);
 	if($opass !=  $usr_pass) {
-		wrn('Nieprawne hasło użytkownika!');
+		wrn('Niepoprawne hasło użytkownika!');
 	}
 	$npass1 = md5($_REQUEST['npassword1']);
 	$npass2 = md5($_REQUEST['npassword2']);

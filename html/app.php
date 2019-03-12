@@ -14,11 +14,14 @@
   <title>devops://Koszalin</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap-confirmation2/dist/bootstrap-confirmation.min.js"></script>
+  <link rel="stylesheet" href="/asset/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/asset/jquery-ui.min.css">
+  <script src="/asset/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/asset/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="/asset/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="/asset/bootstrap-confirmation.min.js"></script>
+  <script src="/asset/clipboard.min.js"></script>
+  <script src="/asset/jquery-ui.min.js"></script>
   <style>
 .tooltip-inner {
     max-width: 100% !important;
@@ -28,9 +31,11 @@
 }
 
 .tty__container iframe {
-  border: 0;
+  border: 1px solid green;
   width: 100%;
+  height: 100%;
 }
+.ui-resizable-helper { border: 2px dotted #00F; }
  </style>
 </head>
 <body>
@@ -105,6 +110,7 @@
 <?php
 	$p=get_pool($ns);
 	sort($p);
+	$eid=0;
 	foreach($p as $vm) {
 		echo "<tr><td>";
 		$vi = get_vm_info($vm);
@@ -115,28 +121,29 @@
 			echo "<h5>INET4: " . $vi[0]['state']['network']['eth0']['addresses'][0]['address']  . "</h5>";
 		}
 		if(isset($vi[0]['state']['network']['eth0']['addresses'][1])) {
-			echo "<h5>INET6: " . $vi[0]['state']['network']['eth0']['addresses'][1]['address'] . "</h5>";
+			$addr = $vi[0]['state']['network']['eth0']['addresses'][1]['address'];
+			echo "<h5>INET6: <span class=\"copyme\" data-clipboard-text=\"$addr\">$addr</span></h5>";
 		}
 		$handle = fopen($n . "/vm/" . $vm, "r");
 		if ($handle) {
 		while (($line = fgets($handle)) !== false) {
 			if(preg_match("/^LXD_PASS=(.+)$/",$line,$match)) {
-				echo "Login: ubuntu</br>";
-				echo "Hasło: <b>" . $match[1] . "</b>";
+				echo "Login: <b><span class=\"copyme\" data-clipboard-text=\"ubuntu\">ubuntu</span></br>";
+				echo "Hasło: <b><span class=\"copyme\" data-clipboard-text=\"" .$match[1] . "\">" . $match[1] . "</span></b>";
 			}
     		}
     		fclose($handle);
 		} 
 		echo "</br>";
-		echo "SSH: ${vm}.lxd.nauka.ga</br>";
+		echo "DNS: <span class=\"copyme\" data-clipboard-text=\"${vm}.lxd.nauka.ga\">${vm}.lxd.nauka.ga</span></br>";
 		} else {
 			echo '<button type="button" class="btn btn-secondary btn-lg">' .$vm  .'</button></br>';
 		}
 		if($status=='Running') {
-			echo "Konsola web: ";
-			echo "<a href=\"http://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">http://${vm}.lxd.nauka.ga:8022/</a><br>";
-                        echo '<div class="tty__container">';
-                        echo '<button class="tty__open" data-url="' . "http://${vm}.lxd.nauka.ga:8022/" . '">';
+			//echo "Konsola web: ";
+			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
+                        echo '<div class="tty__container" id="resizable">';
+                        echo '<button class="tty__open" data-url="' . "https://${vm}.lxd.nauka.ga:8022/" . '">';
                         echo 'KONSOLA';
                         echo '</button></div>';
 
@@ -158,7 +165,7 @@
 		echo ' data-title="UWAGA" data-content="Kontynuować?">';
 		echo 'USUŃ</a>';
 		echo '</div></div>';
-
+		$eid += 10;
 		//echo "<pre>";
 		//print_r($vi);
 		echo "</td></tr>";
@@ -168,6 +175,8 @@
 </table>
     </div>
   </div>
+
+<span id="testowy">ok</id>
 </div>
 <script>
 $(document).ready(function(){
@@ -193,6 +202,21 @@ $('[data-toggle=confirmation]').confirmation({
     container.appendChild(iframe);
   });
 })(document);
+$( function() {
+ $( "#resizable" ).resizable({
+ helper: "ui-resizable-helper"
+    });
+  } );
+
+window.onbeforeunload = (function(){x=window.document.getElementById("resizable");x.innerHTML=""});
+
+var clipboard = new ClipboardJS('.copyme');
+clipboard.on('success', function(e) {
+        console.log(e);
+});
+clipboard.on('error', function(e) {
+   console.log(e);
+});
 </script>
 </body>
 </html>
