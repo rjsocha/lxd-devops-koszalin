@@ -211,12 +211,12 @@ window.onbeforeunload = function() {
 
 document.querySelectorAll('.copyme').forEach(function(el){
 	var parent = el.parentElement;
-	console.log(parent);
 	while(parent.classList.contains('vm-container') || parent.tagName.toLowerCase() === 'body'){
 		parent = parent.parentElement;
 	}
 
 	el.addEventListener('click', function(e){
+		console.log(el.innerHTML);
 		var iframe = parent.querySelector('iframe');
 		if(null !== iframe){
 			var target = iframe.contentWindow;
