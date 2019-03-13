@@ -210,11 +210,7 @@ window.onbeforeunload = function() {
 }
 
 document.querySelectorAll('.copyme').forEach(function(el){
-	var parent = el.parentElement;
-	while(null !== parent || parent.tagName.toLowerCase() !== 'td' || parent.tagName.toLowerCase() !== 'body'){
-		parent = parent.parentElement;
-	}
-
+	var parent = el.closest('td');
 	el.addEventListener('click', function(e){
 		console.log(el.innerHTML, parent);
 		var iframe = parent.querySelector('iframe');
