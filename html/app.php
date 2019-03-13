@@ -115,7 +115,7 @@
 	sort($p);
 	$eid=0;
 	foreach($p as $vm) {
-		echo "<tr><td>";
+		echo "<tr><td class=\"vm-container\">";
 		$vi = get_vm_info($vm);
 		$status=$vi[0]['status'];
 		if($status=='Running') {
@@ -192,8 +192,8 @@ for(var i=0;i<terms.length;i++) {
 	var btn=terms[i].querySelector('.tty_open');
 	var iframe = null;
 	btn.addEventListener('click', function(e){
-    		e.stopPropagation();
-    		e.preventDefault();
+    	e.stopPropagation();
+    	e.preventDefault();
 		this.parentNode.classList.add('enabled');
 		this.parentNode.classList.add('resizable');
 		iframe = document.createElement('iframe');
@@ -206,10 +206,25 @@ for(var i=0;i<terms.length;i++) {
 }
 
 window.onbeforeunload = function() {
-$(".terminal").html("");
+	$(".terminal").html("");
 }
 
-var clipboard = new ClipboardJS('.copyme');
+document.querySelectorAll('.copyme', function(el){
+	var parent = el.parentNode;
+	while(parent.className.contains('vm-container') || parent.tagName.toLowerCase('body')){
+		parent = parent.parentNode;
+	}
+
+	var iframe = parent.querySelector('iframe').contentWindow;
+
+	el.addEventListener('click', function(e){
+		iframe.postMessage(JSON.stringify({method:'write', value:el.innerHtml}, 'https://zero.nauka.ga/app.php'));
+	});
+
+});
+
+
+//var clipboard = new ClipboardJS('.copyme');
 //clipboard.on('success', function(e) {
 //        console.log(e);
 //});
