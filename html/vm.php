@@ -13,10 +13,10 @@
 	}
 	if($res!=0) {
 		echo '<div class="alert alert-danger" role="alert">NIEPOWODZENIE (' . $last . ')</div>';
+		echo '<p></p><p></p><h3><a class="btn btn-primary" role="button" href="/app.php">POWRÓT</a><h3>';
 	} else {
 		//echo '<div class="alert alert-success" role="alert">GOTOWE</div>';
 		echo '<script>window.location.href = "/";</script>';
 	}
 	//
-	echo '<p></p><p></p><h3><a class="btn btn-primary" role="button" href="/app.php">POWRÓT</a><h3>';
 
