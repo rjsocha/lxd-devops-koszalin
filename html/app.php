@@ -143,7 +143,7 @@
 			//echo "Konsola web: ";
 			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
                         echo '<div class="tty_container terminal">';
-                        echo '<button class="tty_open" data-url="' . "https://${vm}.lxd.nauka.ga:8022/" . '">KONSOLA</button>';
+                        echo '<button class="tty_open btn btn-dark " data-url="' . "https://${vm}.lxd.nauka.ga:8022/" . '">KONSOLA</button>';
 			echo '</div>';
 
 		}
