@@ -230,7 +230,7 @@ document.querySelectorAll('.copyme').forEach(function(el){
 			}
 
 			if(el.hasAttribute('data-command')){
-				target.postMessage(value:el.innerHTML, iframe.src);
+				target.postMessage(el.innerHTML, iframe.src);
 			}
 		}	
 	});
