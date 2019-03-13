@@ -226,11 +226,11 @@ document.querySelectorAll('.copyme').forEach(function(el){
 			var target = iframe.contentWindow;
 
 			if(el.hasAttribute('data-command-enter')){
-				target.postMessage(el.innerHTML+"\n", iframe.src);
+				target.postMessage(el.getAttribute('data-command-enter')+"\n", iframe.src);
 			}
 
 			if(el.hasAttribute('data-command')){
-				target.postMessage(el.innerHTML, iframe.src);
+				target.postMessage(el.getAttribute('data-command'), iframe.src);
 			}
 		}	
 	});
