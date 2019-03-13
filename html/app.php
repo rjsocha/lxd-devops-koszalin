@@ -210,9 +210,11 @@ window.onbeforeunload = function() {
 }
 
 document.querySelectorAll('.copyme').forEach(function(el){
-	var parent = el.parentNode;
+	var parent = el.parentElement;
+	console.log(parent);
 	while(parent.classList.contains('vm-container') || parent.tagName.toLowerCase('body')){
-		parent = parent.parentNode;
+		console.log(parent);
+		parent = parent.parentElement;
 	}
 
 	var iframe = parent.querySelector('iframe').contentWindow;
