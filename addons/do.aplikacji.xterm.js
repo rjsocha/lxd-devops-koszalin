@@ -3,6 +3,6 @@ window.addEventListener("message", function(e){
     	return;
     try{ 
     	var data = JSON.parse(e.data);
-    }catch(e){}
+    }catch(e){ console.log(e.data);}
     window.term[data.method](data.value);
 }, false);
