@@ -26,11 +26,11 @@
 .tooltip-inner {
     max-width: 100% !important;
 }
-.tty__container.enabled button{
+.tty_container.enabled button{
   display:none;
 }
 
-.tty__container iframe {
+.tty_container iframe {
   border: 1px solid green;
   width: 100%;
   height: 100%;
@@ -40,7 +40,7 @@
 </head>
 <body>
 
-<div class="jumbotron text-center" style="margin-bottom:0">
+<div class="text-center" style="margin-bottom:0; height: 100%; background: #a6a6a6">
   <h1>devops://Koszalin</h1>
 </div>
 
@@ -128,8 +128,8 @@
 		if ($handle) {
 		while (($line = fgets($handle)) !== false) {
 			if(preg_match("/^LXD_PASS=(.+)$/",$line,$match)) {
-				echo "Login: <b><span class=\"copyme\" data-clipboard-text=\"ubuntu\">ubuntu</span></br>";
-				echo "Hasło: <b><span class=\"copyme\" data-clipboard-text=\"" .$match[1] . "\">" . $match[1] . "</span></b>";
+				echo "Login: <span  class=\"copyme\" data-clipboard-text=\"ubuntu\">ubuntu</span></br>";
+				echo "Hasło: <b><span class=\"copyme\"  style=\"color:#14c504\" data-clipboard-text=\"" .$match[1] . "\">" . $match[1] . "</span></b>";
 			}
     		}
     		fclose($handle);
@@ -142,10 +142,9 @@
 		if($status=='Running') {
 			//echo "Konsola web: ";
 			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
-                        echo '<div class="tty__container" id="resizable">';
-                        echo '<button class="tty__open" data-url="' . "https://${vm}.lxd.nauka.ga:8022/" . '">';
-                        echo 'KONSOLA';
-                        echo '</button></div>';
+                        echo '<div class="tty_container terminal">';
+                        echo '<button class="tty_open" data-url="' . "https://${vm}.lxd.nauka.ga:8022/" . '">KONSOLA</button>';
+			echo '</div>';
 
 		}
 		echo "</br>";
@@ -175,8 +174,6 @@
 </table>
     </div>
   </div>
-
-<span id="testowy">ok</id>
 </div>
 <script>
 $(document).ready(function(){
@@ -186,37 +183,36 @@ $('[data-toggle=confirmation]').confirmation({
   rootSelector: '[data-toggle=confirmation]',
   // other options
 });
-(function(d){
-  var btn = d.querySelector('.tty__open');
-  var container = d.querySelector('.tty__container');
-  var iframe = null;
-  
-  btn.addEventListener('click', function(e){
-    e.stopPropagation();
-    e.preventDefault();
-    
-    container.classList.add('enabled');
-    iframe = d.createElement('iframe');
-    iframe.setAttribute('src', btn.getAttribute('data-url'));
-    
-    container.appendChild(iframe);
-  });
-})(document);
-$( function() {
- $( "#resizable" ).resizable({
- helper: "ui-resizable-helper"
-    });
-  } );
 
-window.onbeforeunload = (function(){x=window.document.getElementById("resizable");x.innerHTML=""});
+terms=document.querySelectorAll('.terminal');
+for(var i=0;i<terms.length;i++) {
+	var btn=terms[i].querySelector('.tty_open');
+	var iframe = null;
+	btn.addEventListener('click', function(e){
+    		e.stopPropagation();
+    		e.preventDefault();
+		this.parentNode.classList.add('enabled');
+		this.parentNode.classList.add('resizable');
+		iframe = document.createElement('iframe');
+		iframe.setAttribute('src', this.getAttribute('data-url'));
+		this.parentNode.insertBefore(iframe,this);
+ 		$(".resizable" ).resizable({
+			helper: "ui-resizable-helper"
+	    	});
+	});
+}
+
+window.onbeforeunload = function() {
+$(".terminal").html("");
+}
 
 var clipboard = new ClipboardJS('.copyme');
-clipboard.on('success', function(e) {
-        console.log(e);
-});
-clipboard.on('error', function(e) {
-   console.log(e);
-});
+//clipboard.on('success', function(e) {
+//        console.log(e);
+//});
+//clipboard.on('error', function(e) {
+//   console.log(e);
+//});
 </script>
 </body>
 </html>
