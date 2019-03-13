@@ -79,13 +79,13 @@
   </div>  
 </nav>
 
-<div class="ontainer-fluid" style="margin-top:30px">
+<div class="ontainer-fluid" style="margin:30px 20px;">
 
 <?php
 		show_note();
 ?>
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-2">
       <h2>Pula VM</h2>
       <ul class="nav nav-pills flex-column">
 <?php
@@ -115,7 +115,7 @@
   </form>
 	</div>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-10">
 <table class="table table-striped">
   <tbody>
 <?php
