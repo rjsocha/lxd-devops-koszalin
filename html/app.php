@@ -211,7 +211,7 @@ window.onbeforeunload = function() {
 
 document.querySelectorAll('.copyme').forEach(function(el){
 	var parent = el.parentElement;
-	while(parent.classList.contains('vm-container') || parent.tagName.toLowerCase() === 'body'){
+	while(parent.classList.contains('vm-container') || parent.tagName.toLowerCase() !== 'body'){
 		parent = parent.parentElement;
 	}
 
