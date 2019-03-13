@@ -222,7 +222,7 @@ document.querySelectorAll('.copyme').forEach(function(el){
 		var iframe = parent.querySelector('iframe');
 		if(null !== iframe){
 			var target = iframe.contentWindow;
-			target.postMessage(JSON.stringify({method:'write', value:el.innerHtml}, iframe.getAttribute('src')));
+			target.postMessage(JSON.stringify({method:'write', value:el.innerHtml}, "https://zero.nauka.ga/app.php"));
 		}
 	});
 });
