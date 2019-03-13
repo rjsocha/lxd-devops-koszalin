@@ -216,7 +216,7 @@ document.querySelectorAll('.copyme').forEach(function(el){
 	}
 
 	el.addEventListener('click', function(e){
-		console.log(el.innerHTML);
+		console.log(el.innerHTML, parent);
 		var iframe = parent.querySelector('iframe');
 		if(null !== iframe){
 			var target = iframe.contentWindow;
