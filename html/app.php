@@ -209,7 +209,7 @@ window.onbeforeunload = function() {
 	$(".terminal").html("");
 }
 
-document.querySelectorAll('.copyme', function(el){
+document.querySelectorAll('.copyme').forEach(function(el){
 	var parent = el.parentNode;
 	while(parent.className.contains('vm-container') || parent.tagName.toLowerCase('body')){
 		parent = parent.parentNode;
@@ -217,7 +217,10 @@ document.querySelectorAll('.copyme', function(el){
 
 	var iframe = parent.querySelector('iframe').contentWindow;
 
+	console.log(el);
+
 	el.addEventListener('click', function(e){
+		console.log(iframe);
 		iframe.postMessage(JSON.stringify({method:'write', value:el.innerHtml}, 'https://zero.nauka.ga/app.php'));
 	});
 
