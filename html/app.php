@@ -211,7 +211,7 @@ window.onbeforeunload = function() {
 
 document.querySelectorAll('.copyme').forEach(function(el){
 	var parent = el.parentElement;
-	while(parent.tagName.toLowerCase() !== 'td' || parent.tagName.toLowerCase() !== 'body'){
+	while(null !== parent || parent.tagName.toLowerCase() !== 'td' || parent.tagName.toLowerCase() !== 'body'){
 		parent = parent.parentElement;
 	}
 
