@@ -115,7 +115,7 @@
   </form>
 	</div>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-12">
 <table class="table table-striped">
   <tbody>
 <?php
