@@ -217,14 +217,18 @@ document.querySelectorAll('.copyme').forEach(function(el){
 		parent = parent.parentElement;
 	}
 
-	var iframe = parent.querySelector('iframe').contentWindow;
+	var iframe = parent.querySelector('iframe');
 
-	console.log(el);
+	if(null !== iframe){
+		var target = iframe.contentWindow;
+		console.log(el);
 
-	el.addEventListener('click', function(e){
-		console.log(iframe);
-		iframe.postMessage(JSON.stringify({method:'write', value:el.innerHtml}, 'https://zero.nauka.ga/app.php'));
-	});
+		el.addEventListener('click', function(e){
+			console.log(iframe);
+			iframe.postMessage(JSON.stringify({method:'write', value:el.innerHtml}, 'https://zero.nauka.ga/app.php'));
+		});
+	}
+
 
 });
 
