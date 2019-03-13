@@ -217,19 +217,14 @@ document.querySelectorAll('.copyme').forEach(function(el){
 		parent = parent.parentElement;
 	}
 
-	var iframe = parent.querySelector('iframe');
-
-	if(null !== iframe){
-		var target = iframe.contentWindow;
-		console.log(el);
-
-		el.addEventListener('click', function(e){
-			console.log(iframe);
+	el.addEventListener('click', function(e){
+		console.log(iframe);
+		var iframe = parent.querySelector('iframe');
+		if(null !== iframe){
+			var target = iframe.contentWindow;
 			iframe.postMessage(JSON.stringify({method:'write', value:el.innerHtml}, 'https://zero.nauka.ga/app.php'));
-		});
-	}
-
-
+		}
+	});
 });
 
 
