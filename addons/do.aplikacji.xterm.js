@@ -1,5 +1,5 @@
 window.addEventListener("message", function(e){
-	if (event.origin !== "https://zero.nauka.ga/app.php")
+	if (event.origin !== "https://zero.nauka.ga")
     	return;
     try{ 
     	var data = JSON.parse(e.data);
