@@ -79,7 +79,7 @@
   </div>  
 </nav>
 
-<div class="container" style="margin-top:30px">
+<div class="ontainer-fluid" style="margin-top:30px">
 
 <?php
 		show_note();
@@ -115,7 +115,7 @@
   </form>
 	</div>
     </div>
-    <div class="col-sm-12">
+    <div class="col-sm-8">
 <table class="table table-striped">
   <tbody>
 <?php
@@ -226,11 +226,11 @@ document.querySelectorAll('.copyme').forEach(function(el){
 			var target = iframe.contentWindow;
 
 			if(el.hasAttribute('data-command-enter')){
-				target.postMessage(JSON.stringify({value:el.innerHTML+"\n"}), iframe.src);
+				target.postMessage(el.innerHTML+"\n", iframe.src);
 			}
 
 			if(el.hasAttribute('data-command')){
-				target.postMessage(JSON.stringify({value:el.innerHTML}), iframe.src);
+				target.postMessage(value:el.innerHTML, iframe.src);
 			}
 		}	
 	});
