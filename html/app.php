@@ -36,6 +36,9 @@
   height: 100%;
 }
 .ui-resizable-helper { border: 2px dotted #00F; }
+
+.tty_container{  padding-bottom: 15px; }
+ 
  </style>
 </head>
 <body>
@@ -198,7 +201,7 @@ for(var i=0;i<terms.length;i++) {
 		this.parentNode.insertBefore(iframe,this);
  		$(".resizable" ).resizable({
 			helper: "ui-resizable-helper"
-	    	});
+	    });
 	});
 }
 
