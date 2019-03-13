@@ -38,6 +38,14 @@
 .ui-resizable-helper { border: 2px dotted #00F; }
 
 .tty_container{  padding-bottom: 15px; }
+
+.copyme{
+	cursor:pointer;
+}
+
+.copyme:hover{
+	text-decoration: underline;
+}
  
  </style>
 </head>
@@ -125,20 +133,20 @@
 		}
 		if(isset($vi[0]['state']['network']['eth0']['addresses'][1])) {
 			$addr = $vi[0]['state']['network']['eth0']['addresses'][1]['address'];
-			echo "<h5>INET6: <span class=\"copyme\" data-clipboard-text=\"$addr\">$addr</span></h5>";
+			echo "<h5>INET6: <span class=\"copyme\" data-command=\"$addr\">$addr</span></h5>";
 		}
 		$handle = fopen($n . "/vm/" . $vm, "r");
 		if ($handle) {
 		while (($line = fgets($handle)) !== false) {
 			if(preg_match("/^LXD_PASS=(.+)$/",$line,$match)) {
-				echo "Login: <span  class=\"copyme\" data-clipboard-text=\"ubuntu\">ubuntu</span></br>";
-				echo "Hasło: <b><span class=\"copyme\"  style=\"color:#14c504\" data-clipboard-text=\"" .$match[1] . "\">" . $match[1] . "</span></b>";
+				echo "Login: <span  class=\"copyme\" data-command-enter=\"ubuntu\">ubuntu</span></br>";
+				echo "Hasło: <b><span class=\"copyme\"  style=\"color:#14c504\" data-command-enter=\"" .$match[1] . "\">" . $match[1] . "</span></b>";
 			}
     		}
     		fclose($handle);
 		} 
 		echo "</br>";
-		echo "DNS: <span class=\"copyme\" data-clipboard-text=\"${vm}.lxd.nauka.ga\">${vm}.lxd.nauka.ga</span></br>";
+		echo "DNS: <span class=\"copyme\" data-command=\"${vm}.lxd.nauka.ga\">${vm}.lxd.nauka.ga</span></br>";
 		} else {
 			echo '<button type="button" class="btn btn-secondary btn-lg">' .$vm  .'</button></br>';
 		}
@@ -216,8 +224,15 @@ document.querySelectorAll('.copyme').forEach(function(el){
 		var iframe = parent.querySelector('iframe');
 		if(null !== iframe){
 			var target = iframe.contentWindow;
-			target.postMessage(JSON.stringify({method:'write', value:el.innerHTML}), iframe.src);
-		}
+
+			if(el.hasAttribute('data-command-enter')){
+				target.postMessage(JSON.stringify({value:el.innerHTML+"\n"}), iframe.src);
+			}
+
+			if(el.hasAttribute('data-command')){
+				target.postMessage(JSON.stringify({value:el.innerHTML}), iframe.src);
+			}
+		}	
 	});
 });
 
