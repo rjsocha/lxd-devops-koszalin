@@ -1,5 +1,6 @@
 window.addEventListener("message", function(e){
-	if (e.origin !== "https://zero.nauka.ga")
+    console.log(e);
+    if (e.origin !== "https://zero.nauka.ga")
     	return;
     try{ 
     	var data = JSON.parse(e.data);

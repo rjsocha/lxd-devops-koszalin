@@ -31,13 +31,16 @@
 }
 
 .tty_container iframe {
-  border: 1px solid green;
+  border: 1px solid lightgrey;
   width: 100%;
   height: 100%;
 }
 .ui-resizable-helper { border: 2px dotted #00F; }
 
 .tty_container{  padding-bottom: 15px; }
+.tty_container.enabled{ background-color: lightgrey }
+.tty_container .status-bar { display: none; }
+.tty_container.enabled .status-bar { display: block; position: absolute; bottom: 3px; left: 5px; font-size: 10px; color: #555; font-weight: bold; }
 
 .copyme{
 	cursor:pointer;
@@ -155,7 +158,7 @@
 			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
                         echo '<div class="tty_container terminal">';
                         echo '<button class="tty_open btn btn-dark " data-url="' . "https://${vm}.lxd.nauka.ga:8022" . '">KONSOLA</button>';
-			echo '</div>';
+			echo '<div class="status-bar">OK <span class="copyme" data-command="\u0012">CLS</span></div></div>';
 
 		}
 		echo "</br>";
@@ -220,7 +223,7 @@ window.onbeforeunload = function() {
 document.querySelectorAll('.copyme').forEach(function(el){
 	var parent = el.closest('td');
 	el.addEventListener('click', function(e){
-		console.log(el.innerHTML, parent);
+		//console.log(el.innerHTML, parent);
 		var iframe = parent.querySelector('iframe');
 		if(null !== iframe){
 			var target = iframe.contentWindow;
