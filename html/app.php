@@ -22,6 +22,7 @@
   <script src="/asset/bootstrap-confirmation.min.js"></script>
   <script src="/asset/clipboard.min.js"></script>
   <script src="/asset/jquery-ui.min.js"></script>
+  <script src="/asset/axios.min.js"></script>
   <style>
 .tooltip-inner {
     max-width: 100% !important;
@@ -38,7 +39,7 @@
 .ui-resizable-helper { border: 2px dotted #00F; }
 
 .tty_container{  padding-bottom: 18px; }
-.tty_container.enabled{ background-color: lightgrey }
+.tty_container.enabled{ background-color: lightgrey; height: 25em; }
 .tty_container .status-bar { display: none; }
 .tty_container.enabled .status-bar { display: block; position: absolute; bottom: 3px; left: 5px; font-size: 11px; color: #555; font-weight: bold; }
 
@@ -79,15 +80,20 @@
     transform: translate3d(2px, 0, 0);
   }
 }
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: red;
+  color: white;
+  text-align: center;
+}
 </style>
 </head>
 <body>
-
-<div class="text-center" style="margin-bottom:0; height: 100%; background: #a6a6a6">
-  <h1>devops://Koszalin</h1>
-</div>
-
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+  <div class="navbar-brand">devops://Koszalin</div>
   <div class="collapse navbar-collapse" id="collapsibleNavbar">
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -277,5 +283,10 @@ var clipboard = new ClipboardJS('.clipme');
 //   console.log(e);
 //});
 </script>
+<footer class="footer">
+ <div class="container">
+	Wersja: <?php echo get_my_version(); ?>
+ </div>
+</footer>
 </body>
 </html>

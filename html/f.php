@@ -48,4 +48,13 @@ function get_vm_info($vm) {
 	}
 	return array();
 }
+
+function get_my_version() {
+	$ver="1.0";
+	if(file_exists("/var/www/.git/refs/heads/master")) {
+		return $ver . "-" . file_get_contents("/var/www/.git/refs/heads/master");
+	} else {
+		return $ver;
+	}
+}
 ?>
