@@ -16,9 +16,9 @@ pass=$(/usr/bin/pwgen -B 8 1)
 if [[ ! -f ~/.vm/pool/$NAME ]]
 then
 	(
-		flock -n 10 || exit 1
+		flock -n 10 || exit 100
 		:>~/.vm/pool/$NAME.tmp
-		/usr/bin/lxc launch --profile ubuntu ubuntu-devops $NAME 2>&1
+		/usr/bin/lxc launch --profile ubuntu ubuntu-devops $NAME -c security.nesting=true 2>&1
 		if [[ $? -ne 0 ]]
 		then
 			rm ~/.vm/pool/$NAME.tmp

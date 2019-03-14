@@ -41,7 +41,18 @@
 .tty_container{  padding-bottom: 18px; }
 .tty_container.enabled{ background-color: lightgrey; height: 25em; }
 .tty_container .status-bar { display: none; }
-.tty_container.enabled .status-bar { display: block; position: absolute; bottom: 3px; left: 5px; font-size: 11px; color: #555; font-weight: bold; }
+.tty_container.enabled .status-bar { display: flex; justify-content: space-between; right: 30px; position: absolute; bottom: 3px; left: 5px; font-size: 12px; color: #555; font-weight: bold; }
+
+.red { background-color: red; color: white; }
+
+.red::placeholder { 
+ color: white;
+
+}
+
+.bg-trans {
+	transition: background-color 0.6s ease;
+}
 
 .copyme{
 	cursor:pointer;
@@ -57,6 +68,17 @@
 	height: 1em;
 	vertical-align: initial;
 }
+
+.reload {
+	cursor: pointer;
+	width: 18px;
+	height: 18px;
+	vertical-align: top;
+}
+.reload.spin {
+	animation: spin 2s linear infinite;
+}
+
 .clipme:hover {
   animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
@@ -80,14 +102,46 @@
     transform: translate3d(2px, 0, 0);
   }
 }
+
 .footer {
   position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
-  background-color: red;
+  background-color: crimson;
   color: white;
   text-align: center;
+}
+
+#vm_loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  margin: -3em 0 0 -3em;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 6em;
+  height: 6em;
+  animation: spin 2s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-bottom {
+  position: relative;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@keyframes animatebottom { 
+  from{ bottom:-100px; opacity:0 } 
+  to{ bottom:0; opacity:1 }
 }
 </style>
 </head>
@@ -124,33 +178,17 @@
 ?>
   <div class="row">
     <div class="col-sm-2">
-      <h2>Pula VM</h2>
-      <ul class="nav nav-pills flex-column">
-<?php
-	$p=get_pool();
-	shuffle($p);
-	foreach($p as $vm) {
-        	echo '<li class="nav-item">';
-		$vi = get_vm_info($vm);
-		if(isset($vi[0]['state']['network']['eth0']['addresses'][1])) {
-			$t=$vi[0]['state']['network']['eth0']['addresses'][1]['address'] . '/64';
-		} else {
-			$t="collecting";
-		}
-		echo "<a class=\"nav-link\" data-toggle=\"tooltip\" title=\"". $t . "\" data-placement=\"left\" href=\"/use.php?vm=$vm\">$vm</a>";
-        	echo '</li>';
-	}
-
-?>
+      <h2>Pula VM <img src="/asset/reload.svg" class="reload" id="reload_vm_pool">  </h2>
+      <ul class="nav nav-pills flex-column" id="vms">
       </ul>
       <div>
-  <form  action="/createvm.php" method=post>
-    <div class="form-group form-check-inline">
-      <input type="text" class="form-control" id="email" placeholder="Nazwa dla VM" name="vm">
-&nbsp;&nbsp;
-    <button type="submit" class="btn btn-success">Nowa</button>
-   </div>
-  </form>
+  		<form  action="/createvm.php" method=post>
+    		<div class="form-group form-check-inline">
+		      <input type="text" class="form-control bg-trans" id="vm_name" placeholder="Nazwa dla VM" name="vm">
+		      &nbsp;&nbsp;
+		      <button type="submit" class="btn btn-success" id="vm_add">Nowa</button>
+		</div>
+		</form>
 	</div>
     </div>
     <div class="col-sm-10">
@@ -194,7 +232,7 @@
 			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
                         echo '<div class="tty_container terminal">';
                         echo '<button class="tty_open btn btn-dark " data-url="' . "https://${vm}.lxd.nauka.ga:8022" . '">KONSOLA</button>';
-			echo '<div class="status-bar">' . ${vm} . '.lxd.nauka.ga&nbsp;&nbsp;&nbsp;<span class="copyme" data-command="&#12;">CLS</span> <span class="copyme" data-command="&#03;">CTRL+C</span> &nbsp;&nbsp;&nbsp;<b><span class="copyme" data-command="&#04;">CTRL+D</span> </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="copyme" data-command="fontsize:10">10</span> <span class="copyme" data-command="fontsize:12">12</span> <span class="copyme" data-command="fontsize:14">14</span> <span class="copyme" data-command="fontsize:16">16</span> <span class="copyme" data-command="fontsize:18">18</span> <span class="copyme" data-command="fontsize:20">20</span></div></div>';
+			echo '<div class="status-bar"><div>' . $vm . '.lxd.nauka.ga</div><div><span class="copyme" data-command="&#12;">CLS</span> <span class="copyme" data-command="&#03;">CTRL+C</span></div><div><b><span class="copyme" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="copyme" data-command="fontsize:10">10</span> <span class="copyme" data-command="fontsize:12">12</span> <span class="copyme" data-command="fontsize:14">14</span> <span class="copyme" data-command="fontsize:16">16</span> <span class="copyme" data-command="fontsize:18">18</span> <span class="copyme" data-command="fontsize:20">20</span></div></div></div>';
 
 		}
 		echo "</br>";
@@ -275,7 +313,80 @@ document.querySelectorAll('.copyme').forEach(function(el){
 	});
 });
 
+newvm = document.querySelector('#vm_add');
+newvm.addEventListener('click', function(event){
+        event.stopPropagation();
+        event.preventDefault();
+	var value=document.querySelector("#vm_name").value;
+	var rx = /^[a-zA-Z][0-9a-zA-Z]+$/
+	if( value == "" || rx.test(value) == false ) {
+		setTimeout(function() {
+			document.querySelector("#vm_name").classList.remove("red");
+		},550);
+		document.querySelector("#vm_name").classList.add("red");
+		return;
+	}
+	document.querySelector('#reload_vm_pool').classList.add("spin");
+	event.target.disabled=true;
+	document.querySelector("#vm_name").disabled=true;
+	axios.post('/xhr-create-vm.php', {vm: value})
+  .then(function (response) {
+    // handle success
+	  console.log(response);
+	  console.log(response.data);
+	  document.querySelector("#vm_name").value="";
+  })
+  .catch(function (error) {
+    // handle error
+    console.log('error',error);
+  })
+  .then(function () {
+    // always executed
+	event.target.disabled=false;
+	document.querySelector("#vm_name").disabled=false;
+	document.querySelector('#reload_vm_pool').classList.remove("spin");
+	vms_refresh();
+  });
+
+});
+var vmpool_lock = 0;
+
+vmpool = document.querySelector('#reload_vm_pool');
+vmpool.addEventListener('click', function(event){
+	if(vmpool_lock)
+		return;
+	vmpool_lock=1;
+	vms_refresh();
+});
+
+function vms_refresh(event) {
+	document.querySelector('#reload_vm_pool').classList.add("spin");
+	axios.get('/xhr-vms.php').then(function (response) {
+		// handle success
+		if(Array.isArray(response.data)) {
+			var arr = response.data;
+			vmhtml="";
+			for(var i=0; i<arr.length; i++) {
+				vm=arr[i];
+				vmhtml = vmhtml + '<li class="nav-item"><a class="nav-link" data-toggle="tooltip" title="' + vm.inet6 + '" data-placement="left" href="/use.php?vm=' + vm.vm + '">' + vm.vm +'</a></li>';
+			}
+			if(vmhtml.length>0) {
+				document.querySelector("#vms").innerHTML=vmhtml;
+			}
+		}
+  	}).catch(function (error) {
+    		// handle error
+	    	console.log('error',error);
+  	}).then(function () {
+	 	// always executed
+		document.querySelector('#reload_vm_pool').classList.remove("spin");
+		vmpool_lock=0;
+	 });
+}
 var clipboard = new ClipboardJS('.clipme');
+
+vms_refresh();
+
 //clipboard.on('success', function(e) {
 //        console.log(e);
 //});
