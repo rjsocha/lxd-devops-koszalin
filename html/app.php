@@ -37,10 +37,10 @@
 }
 .ui-resizable-helper { border: 2px dotted #00F; }
 
-.tty_container{  padding-bottom: 15px; }
+.tty_container{  padding-bottom: 18px; }
 .tty_container.enabled{ background-color: lightgrey }
 .tty_container .status-bar { display: none; }
-.tty_container.enabled .status-bar { display: block; position: absolute; bottom: 3px; left: 5px; font-size: 10px; color: #555; font-weight: bold; }
+.tty_container.enabled .status-bar { display: block; position: absolute; bottom: 3px; left: 5px; font-size: 11px; color: #555; font-weight: bold; }
 
 .copyme{
 	cursor:pointer;
@@ -188,7 +188,7 @@
 			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
                         echo '<div class="tty_container terminal">';
                         echo '<button class="tty_open btn btn-dark " data-url="' . "https://${vm}.lxd.nauka.ga:8022" . '">KONSOLA</button>';
-			echo '<div class="status-bar">' . ${vm} . '.lxd.nauka.ga&nbsp;&nbsp;&nbsp;<span class="copyme" data-command="&#12;">CLS</span> <span class="copyme" data-command="&#03;">CTRL+C</span> &nbsp;&nbsp;&nbsp;<b><span class="copyme" data-command="&#04;">CTRL+D</span> </b></div></div>';
+			echo '<div class="status-bar">' . ${vm} . '.lxd.nauka.ga&nbsp;&nbsp;&nbsp;<span class="copyme" data-command="&#12;">CLS</span> <span class="copyme" data-command="&#03;">CTRL+C</span> &nbsp;&nbsp;&nbsp;<b><span class="copyme" data-command="&#04;">CTRL+D</span> </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="copyme" data-command="fontsize:10">10</span> <span class="copyme" data-command="fontsize:12">12</span> <span class="copyme" data-command="fontsize:14">14</span> <span class="copyme" data-command="fontsize:16">16</span> <span class="copyme" data-command="fontsize:18">18</span> <span class="copyme" data-command="fontsize:20">20</span></div></div>';
 
 		}
 		echo "</br>";
