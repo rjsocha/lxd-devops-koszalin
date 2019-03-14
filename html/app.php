@@ -102,7 +102,6 @@
     transform: translate3d(2px, 0, 0);
   }
 }
-
 .footer {
   position: fixed;
   left: 0;
