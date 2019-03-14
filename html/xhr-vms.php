@@ -6,7 +6,7 @@
 		die();
 	}
 	$p=get_pool();
-	shuffle($p);
+	sort($p);
 	$ret = array();
 	foreach($p as $vm) {
 		$vi = get_vm_info($vm);

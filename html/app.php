@@ -54,6 +54,10 @@
 	transition: background-color 0.6s ease;
 }
 
+#footline {
+	transition: background-color 1.0s ease;
+}
+
 .copyme{
 	cursor:pointer;
 }
@@ -107,7 +111,8 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  background-color: crimson;
+  font-size: 1.5em;
+  background-color: white;
   color: white;
   text-align: center;
 }
@@ -231,7 +236,7 @@
 			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
                         echo '<div class="tty_container terminal">';
                         echo '<button class="tty_open btn btn-dark " data-url="' . "https://${vm}.lxd.nauka.ga:8022" . '">KONSOLA</button>';
-			echo '<div class="status-bar"><div>' . $vm . '.lxd.nauka.ga</div><div><span class="copyme" data-command="&#12;">CLS</span> <span class="copyme" data-command="&#03;">CTRL+C</span></div><div><b><span class="copyme" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="copyme" data-command="fontsize:10">10</span> <span class="copyme" data-command="fontsize:12">12</span> <span class="copyme" data-command="fontsize:14">14</span> <span class="copyme" data-command="fontsize:16">16</span> <span class="copyme" data-command="fontsize:18">18</span> <span class="copyme" data-command="fontsize:20">20</span></div></div></div>';
+			echo '<div class="status-bar"><div>' . $vm . '.lxd.nauka.ga</div><div><span class="copyme" data-command="&#12;">CLS</span></div><div><span class="copyme" data-command="&#03;">CTRL+C</span></div><div><b><span class="copyme" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="copyme" data-command="fontsize:10">10</span> <span class="copyme" data-command="fontsize:12">12</span> <span class="copyme" data-command="fontsize:14">14</span> <span class="copyme" data-command="fontsize:16">16</span> <span class="copyme" data-command="fontsize:18">18</span> <span class="copyme" data-command="fontsize:20">20</span></div></div></div>';
 
 		}
 		echo "</br>";
@@ -262,6 +267,7 @@
     </div>
   </div>
 </div>
+	Wersja: <?php echo get_my_version(); ?>
 <script>
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();   
@@ -328,12 +334,24 @@ newvm.addEventListener('click', function(event){
 	document.querySelector('#reload_vm_pool').classList.add("spin");
 	event.target.disabled=true;
 	document.querySelector("#vm_name").disabled=true;
+	info_foot("clear");
 	axios.post('/xhr-create-vm.php', {vm: value})
   .then(function (response) {
     // handle success
-	  console.log(response);
-	  console.log(response.data);
-	  document.querySelector("#vm_name").value="";
+	  if(response.data.status == 0) {
+		info_foot("ok","GOTOWE",5000);
+	  	document.querySelector("#vm_name").value="";
+	  } else if(response.data.status == 200) {
+		  if(response.data.rc == 100) {
+		  	info_foot("fail","W tej chwili tworzona jest inna maszyna wirtualna. Spróbuj ponownie za chwilę :)",8000);
+		  } else {
+			  info_foot("fail","BACKEND ERROR " + response.data.rc,7000);
+		  }
+	  } else if(response.data.status == 102) {
+		  	info_foot("fail","istnieje już maszyna wirtualna o takiej nazwie",5000);
+	  } else {
+		  info_foot("fail","BŁĄD: " + response.data.status,8000);
+	  }
   })
   .catch(function (error) {
     // handle error
@@ -355,6 +373,7 @@ vmpool.addEventListener('click', function(event){
 	if(vmpool_lock)
 		return;
 	vmpool_lock=1;
+	info_foot("clear");
 	vms_refresh();
 });
 
@@ -382,6 +401,46 @@ function vms_refresh(event) {
 		vmpool_lock=0;
 	 });
 }
+var info_timeout;
+	
+function info_foot(kind,msg,autoclear) {
+	var box = document.querySelector('#footline');
+	box.style.Color="white";
+	if(kind=="clear") {
+		box.style.backgroundColor="white";
+		msg = undefined;
+		if(info_timeout !== undefined) {
+			clearTimeout(info_timeout);
+			info_timeout=undefined;
+                }
+	} else if (kind=="ok") {
+		box.style.backgroundColor="#28a745";
+	} else if (kind=="fail") {
+		box.style.backgroundColor="crimson";
+	} else {
+		return;
+	}
+	if(msg) {
+		box.innerHTML=msg;
+	} else {
+		box.innerHTML="";
+	}
+	if(autoclear>0) {
+		if(info_timeout !== undefined) {
+			clearTimeout(info_timeout);
+		}
+		info_timeout=setTimeout(function() {
+			info_foot("clear");	
+		},autoclear);
+	}
+}
+
+var pingme = function() {
+	axios.get('/ping.php');
+}
+
+setInterval(pingme,60*1000);
+
 var clipboard = new ClipboardJS('.clipme');
 
 vms_refresh();
@@ -394,8 +453,7 @@ vms_refresh();
 //});
 </script>
 <footer class="footer">
- <div class="container">
-	Wersja: <?php echo get_my_version(); ?>
+ <div class="container-fluid" id="footline">
  </div>
 </footer>
 </body>
