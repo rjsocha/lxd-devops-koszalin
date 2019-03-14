@@ -1,0 +1,11 @@
+[Unit]
+Description=WebSocekt Terminal
+After=network.target auditd.service
+
+[Service]
+ExecStart=/sbin/ttyd.inhouse -p 8022 -S -r 2 -6 -C /etc/ssl/certs/lxd.nauka.ga.full.cer -K /etc/ssl/private/lxd.nauka.ga.key -A /etc/ssl/certs/ca-certificates.crt /bin/login
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
