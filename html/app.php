@@ -50,7 +50,36 @@
 	text-decoration: underline;
 }
  
- </style>
+.clipme {
+	cursor: pointer;
+	width: 1em;
+	height: 1em;
+	vertical-align: initial;
+}
+.clipme:hover {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-2px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(2px, 0, 0);
+  }
+}
+</style>
 </head>
 <body>
 
@@ -130,26 +159,27 @@
 		$vi = get_vm_info($vm);
 		$status=$vi[0]['status'];
 		if($status=='Running') {
-			echo '<button type="button" class="btn btn-warning btn-lg">' .$vm  .'</button></br>';
+			echo '<button type="button" class="btn btn-warning btn-lg">' .$vm  .'.lxd.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="'. $vm . '.lxd.nauka.ga" class="clipme"> </button></br>';
 		if(isset($vi[0]['state']['network']['eth0']['addresses'][0])) {
 			echo "<h5>INET4: " . $vi[0]['state']['network']['eth0']['addresses'][0]['address']  . "</h5>";
 		}
 		if(isset($vi[0]['state']['network']['eth0']['addresses'][1])) {
 			$addr = $vi[0]['state']['network']['eth0']['addresses'][1]['address'];
-			echo "<h5>INET6: <span class=\"copyme\" data-command=\"$addr\">$addr</span></h5>";
+			echo "<h5>INET6: $addr <img src=\"/asset/clip.svg\" class=\"clipme\" data-clipboard-text=\"$addr\"></h5>";
 		}
 		$handle = fopen($n . "/vm/" . $vm, "r");
 		if ($handle) {
 		while (($line = fgets($handle)) !== false) {
 			if(preg_match("/^LXD_PASS=(.+)$/",$line,$match)) {
-				echo "Login: <span  class=\"copyme\" data-command-enter=\"ubuntu\">ubuntu</span></br>";
-				echo "Hasło: <b><span class=\"copyme\"  style=\"color:#14c504\" data-command-enter=\"" .$match[1] . "\">" . $match[1] . "</span></b>";
+				$vm_pass = $match[1];
+				echo "Login: <span  class=\"copyme\" data-command-enter=\"ubuntu\">ubuntu</span> &nbsp;&nbsp;<img src=\"/asset/clip.svg\" class=\"clipme\" data-clipboard-text=\"ubuntu\"></br>";
+				echo "Hasło: <b><span class=\"copyme\"  style=\"color:#14c504\" data-command-enter=\"" .$vm_pass . "\">" . $vm_pass . "</span>&nbsp;&nbsp;<img src=\"/asset/clip.svg\" class=\"clipme\" data-clipboard-text=\"$vm_pass\"></b>";
 			}
     		}
     		fclose($handle);
 		} 
 		echo "</br>";
-		echo "DNS: <span class=\"copyme\" data-command=\"${vm}.lxd.nauka.ga\">${vm}.lxd.nauka.ga</span></br>";
+		//echo "DNS: <span class=\"copyme\" data-command=\"${vm}.lxd.nauka.ga\">${vm}.lxd.nauka.ga</span></br>";
 		} else {
 			echo '<button type="button" class="btn btn-secondary btn-lg">' .$vm  .'</button></br>';
 		}
@@ -158,7 +188,7 @@
 			//echo "<a href=\"https://${vm}.lxd.nauka.ga:8022/\" target=\"_blank\">https://${vm}.lxd.nauka.ga:8022/</a><br>";
                         echo '<div class="tty_container terminal">';
                         echo '<button class="tty_open btn btn-dark " data-url="' . "https://${vm}.lxd.nauka.ga:8022" . '">KONSOLA</button>';
-			echo '<div class="status-bar">OK <span class="copyme" data-command="\u0012">CLS</span></div></div>';
+			echo '<div class="status-bar">' . ${vm} . '.lxd.nauka.ga&nbsp;&nbsp;&nbsp;<span class="copyme" data-command="&#12;">CLS</span> <span class="copyme" data-command="&#03;">CTRL+C</span> &nbsp;&nbsp;&nbsp;<b><span class="copyme" data-command="&#04;">CTRL+D</span> </b></div></div>';
 
 		}
 		echo "</br>";
@@ -239,8 +269,7 @@ document.querySelectorAll('.copyme').forEach(function(el){
 	});
 });
 
-
-//var clipboard = new ClipboardJS('.copyme');
+var clipboard = new ClipboardJS('.clipme');
 //clipboard.on('success', function(e) {
 //        console.log(e);
 //});
