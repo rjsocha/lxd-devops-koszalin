@@ -1,7 +1,7 @@
 <?php
 function wrn($w) {
 	warnme($w);
-	header('Location: /app.php');
+	header('Location: /app.html');
 	die();
 }
 
@@ -39,4 +39,4 @@ function wrn($w) {
 	}
 	file_put_contents($n . "/password",$npass1);
 	infome('Hasło zostało prawidłowo zmienione!');
-	header('Location: /app.php');
+	header('Location: /app.html');

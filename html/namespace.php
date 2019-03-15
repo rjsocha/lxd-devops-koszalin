@@ -3,7 +3,7 @@
 	require('f.php');
 
 	if(isset($_SESSION['namespace'])) {
-		header("Location: /app.php");
+		header("Location: /app.html");
 		die();
 	}
 
@@ -16,7 +16,7 @@ function go_login($w="") {
 }
 function create_session($n) {
 	$_SESSION['namespace']=$n;
-	header("Location: /app.php");
+	header("Location: /app.html");
 	die();
 }
 

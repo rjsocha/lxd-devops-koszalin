@@ -5,9 +5,10 @@
 		header('HTTP/1.0 403 Forbidden');
 		die();
 	}
-	$n = "/home/socha/.vm/namespace/" . $_SESSION['namespace'];
+	$ns = $_SESSION['namespace'];
+	$ns_dir = "/home/socha/.vm/namespace/" . $ns;
 
-	if(!file_exists($n)) {
+	if(!file_exists($ns_dir)) {
 		header('HTTP/1.0 403 Forbidden');
 		die();
 	}
@@ -26,17 +27,17 @@
 		echo json_encode($ret);
 		die();
 	}
-	if(file_exists('/home/socha/.vm/pool/' . $vm)) {
+	if(!file_exists('/home/socha/.vm/free/' . $vm)) {
 		$ret['status'] = 102;
-		$ret['error'] = 'vm already exists';
+		$ret['error'] = 'vm do not exist';
 		echo json_encode($ret);
 		die();
 
 	}
-	$last=exec('/var/www/scripts/spawn-new-xhr ' . $vm,$out,$res);
+	$last=exec(sprintf("/var/www/scripts/use_vm %s %s",$vm,$ns),$out,$res);
 	if($res!=0) {
 		$ret['status'] = 200;
-		$ret['error'] = 'create vm failed';
+		$ret['error'] = 'start vm failed';
 		$ret['info'] = $last;
 		$ret['rc'] = $res;
 	} else {

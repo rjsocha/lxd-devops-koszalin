@@ -18,6 +18,7 @@
 		$vi = $vi[0];
 		$status = strtolower($vi['status']);
 		$ret[$idx]['have_ip6']=0;
+		$ret[$idx]['have_ip4']=0;
 		$ret[$idx]['name']=$vm;
 		$ret[$idx]['state']=$status;
 		$ret[$idx]['domain']='lxd.nauka.ga';
@@ -39,6 +40,7 @@
 						foreach($net_if['addresses'] as $addr) {
 							if($addr['scope']=="global") {
 								if($addr['family']=="inet6") $has_ip6_global=1;
+								if($addr['family']=="inet") $has_ip4_global=1;
 								$ret[$idx]['network'][$addr['family']][]=array("address"=>$addr['address'],"netmask"=>$addr['netmask']);
 							}
 					       }
@@ -61,8 +63,15 @@
 			if($has_ip6_global) { 
 				$ret[$idx]['have_ip6']=1;
 			}
+			if($has_ip4_global) { 
+				$ret[$idx]['have_ip4']=1;
+			}
+			if(!$has_ip6_global || !$has_ip4_global) {
+				$ret[$idx]['state'] = 'booting';
+			}
 
 		}
 		$idx++;
 	}
+	//sleep(2);
 	echo json_encode($ret);

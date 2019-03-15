@@ -21,6 +21,10 @@
   display:none;
 }
 
+.my-modal {
+  border: 4px solid red;
+}
+
 .tty_container iframe {
   border: 1px solid lightgrey;
   width: 100%;
@@ -166,7 +170,7 @@
       <ul class="nav nav-pills flex-column" id="vms">
       </ul>
       <div>
-  		<form  action="/createvm.php" method=post>
+  		<form  action="#" method=post>
     		<div class="form-group form-check-inline">
 		      <input type="text" class="form-control bg-trans" id="vm_name" placeholder="Nazwa dla VM" name="vm">
 		      &nbsp;&nbsp;
@@ -176,6 +180,7 @@
 	</div>
     </div>
     <div class="col-sm-10">
+	    <img src="/asset/reload.svg" class="reload" id="reload_my_vm">
 <table class="table table-striped" id="my">
   <tbody>
   </tbody>
@@ -202,7 +207,7 @@ newvm.addEventListener('click', function(event){
         event.stopPropagation();
         event.preventDefault();
 	var value=document.querySelector("#vm_name").value;
-	var rx = /^[a-zA-Z][0-9a-zA-Z]+$/
+	var rx = /^[a-zA-Z]([0-9a-zA-Z]){1,15}$/
 	if( value == "" || rx.test(value) == false ) {
 		setTimeout(function() {
 			document.querySelector("#vm_name").classList.remove("red");
@@ -256,21 +261,29 @@ vmpool.addEventListener('click', function(event){
 	vms_refresh();
 });
 
-function vms_refresh(event) {
+var myvm_lock = 0;
+
+var myvm = document.querySelector('#reload_my_vm');
+myvm.addEventListener('click', function(event){
+	info_foot("clear");
+	my_vm_refresh();
+});
+
+
+function vms_refresh() {
 	document.querySelector('#reload_vm_pool').classList.add("spin");
 	axios.get('/xhr-vms.php').then(function (response) {
 		// handle success
+		var vmhtml="";
 		if(Array.isArray(response.data)) {
 			var arr = response.data;
-			vmhtml="";
 			for(var i=0; i<arr.length; i++) {
 				vm=arr[i];
-				vmhtml = vmhtml + '<li class="nav-item"><a class="nav-link" data-toggle="tooltip" title="' + vm.inet6 + '" data-placement="left" href="/use.php?vm=' + vm.vm + '">' + vm.vm +'</a></li>';
-			}
-			if(vmhtml.length>0) {
-				document.querySelector("#vms").innerHTML=vmhtml;
+				vmhtml = vmhtml + `<li class="nav-item"><a class="nav-link action-triger" data-toggle="tooltip" title="${vm.inet6}" data-action="use" data-action-target="${vm.vm}" data-placement="left" href="/use">${vm.vm}</a></li>`;
 			}
 		}
+		document.querySelector("#vms").innerHTML=vmhtml;
+		add_click_listeners();
   	}).catch(function (error) {
     		// handle error
 	    	console.log('error',error);
@@ -289,6 +302,8 @@ var vhtml;
 	var state;
 	state=vm.state;
 	if(state=="running") {
+		var btcolor="btn-success";
+	} else if (state=="booting") {
 		var btcolor="btn-warning";
 	} else {
 		var btcolor="btn-secondary";
@@ -306,12 +321,12 @@ var vhtml;
 			}
 		}
 	}
+	if(state == 'running') {
+
 		if(typeof vm.data !== "undefined" && typeof vm.data.os !== "undefined") {
 			vhtml += `Login: <span  class="paste-me" data-command-enter="${vm.data.os.username}">${vm.data.os.username}</span> &nbsp;&nbsp;<img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.data.os.username}"></br>`;
 			vhtml += `Hasło: <b><span class="paste-me" style="color:#14c504" data-command-enter="${vm.data.os.password}">${vm.data.os.password}</span>&nbsp;&nbsp;<img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.data.os.password}"></b>`;
 		}
-	if(state == 'running') {
-	
                 vhtml += `<div class="tty_container terminal">`;
                 vhtml += `<button class="tty_open btn btn-dark " data-url="https://${vm.name}.lxd.nauka.ga:8022">TERMINAL</button>`;
 		vhtml += `<div class="status-bar"><div>${vm.name}.lxd.nauka.ga</div><div><span class="paste-me" data-command="&#12;">CLS</span></div><div><span class="paste-me" data-command="&#03;">CTRL+C</span></div><div><b><span class="paste-me" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="paste-me" data-command="fontsize:10">10</span> <span class="paste-me" data-command="fontsize:12">12</span> <span class="paste-me" data-command="fontsize:14">14</span> <span class="paste-me" data-command="fontsize:16">16</span> <span class="paste-me" data-command="fontsize:18">18</span> <span class="paste-me" data-command="fontsize:20">20</span></div></div></div>`;
@@ -320,12 +335,16 @@ var vhtml;
 	vhtml += `<div class="col">`;
 	if(state=="running") {
 		vhtml += `<a href="#" role="button" class="btn btn-primary action-triger" data-action="stop" data-action-target="${vm.id}">STOP</a>`;
-	} else {
+	} else if(state=="stopped") {
 		vhtml += `<a href="#" role="button" class="btn btn-success action-triger" data-action="start" data-action-target="${vm.id}">START</a>`;
 	}
 	vhtml += `</div>`;
 	vhtml += `<div class="col text-right">`;
-	vhtml += `<a href="#" class="btn btn-large btn-danger action-triger" data-action="remove" data-action-target="${vm.id}">USUŃ</a>`;
+	if(state=="booting") {
+		vhtml += `<a href="#" class="btn btn-large btn-danger action-triger" data-action="none" data-action-target="">URUCHAMIANIE</a>`;
+	} else {
+		vhtml += `<a href="#" class="btn btn-large btn-danger action-triger" data-action="remove" data-action-target="${vm.id}">USUŃ</a>`;
+	}
 	vhtml += `</div>`;
 	vhtml += `</div></p>`;
 	vhtml += "</td>";
@@ -333,6 +352,7 @@ var vhtml;
 
 	return vhtml;
 }
+var booting_refresh;
 
 function my_vm_render(data) {
 	var mytable = document.getElementById("my");
@@ -344,26 +364,67 @@ function my_vm_render(data) {
 	var vm;
 	for(var i=0; i<wdata.length;i++) {
 		vm=wdata[i];
-		lastvm=vm;
 		if(vm.id) {
 			trow=document.getElementById(vm.id)
 			if( trow == undefined ) {
 				var newrow = mytable.insertRow(-1);
 				newrow.setAttribute('id',vm.id);
 				newrow.setAttribute('data-vm-state',vm.state);
+				console.log('                                 vm:' + vm.name);
 				newrow.setAttribute('data-vm-name',vm.name);
+				newrow.setAttribute('data-vm-domain',vm.domain);
 				newrow.innerHTML=my_vm_render_html(vm);
 				add_click_listeners();
 				add_terminal_listeners();
 				add_paste_listeners();
 
+			} else {
+				var vm_name,vm_state,vm_id;
+				vm_name=trow.getAttribute('data-vm-name');
+				vm_state=trow.getAttribute('data-vm-state');
+				if(vm.state!=vm_state) {
+					console.log('change state of ' + vm.name);
+					trow.innerHTML=my_vm_render_html(vm);
+					trow.setAttribute('data-vm-state',vm.state);
+					add_click_listeners();
+					add_terminal_listeners();
+					add_paste_listeners();
+				}
 			}
-			console.log(vm);
+			//console.log(vm);
+			if(vm.state=="booting" && booting_refresh===undefined) {
+				console.log(' ############################################## seting auto refresh');
+				booting_refresh=setTimeout(function() {
+					booting_refresh=undefined;
+					my_vm_refresh();
+				},750);
+			}
+
+
 		}
 	}
+	// wyszukanie usunietych maszyn
+	mytable.querySelectorAll('tr').forEach(function(tr) {
+		var matchFound = false;
+		var id=tr.getAttribute('id');
+		for(var i=0; i<wdata.length; i++) {
+			if(id == wdata[i].id) {
+				matchFound=true;
+				break;
+			}
+		}
+		if(!matchFound) {
+			console.log("MISSING: ",id);
+			tr.parentNode.removeChild(tr);
+		}
+	});
 }
 
 function my_vm_refresh() {
+	if(myvm_lock)
+		return;
+	myvm_lock=1;
+	document.querySelector('#reload_my_vm').classList.add("spin");
 	axios.get('/xhr-my-vm.php').then(function (response) {
 		if(response.data) {
 			my_vm_render(response.data);
@@ -373,8 +434,8 @@ function my_vm_refresh() {
 	    	console.log('error',error);
   	}).then(function () {
 	 	// always executed
-		document.querySelector('#reload_vm_pool').classList.remove("spin");
-		vmpool_lock=0;
+		document.querySelector('#reload_my_vm').classList.remove("spin");
+		myvm_lock=0;
 	 });
 }
 var info_timeout;
@@ -479,14 +540,34 @@ function dispatch_click_action(e) {
 	var action=elm.getAttribute('data-action');
 	var target=elm.getAttribute('data-action-target');
 	if(typeof action === 'string') {
-		var telm=document.getElementById(target);
-		if(telm == null) {
-			console.log("Missing target element: " + target);
-			return;
-		}
 		switch(action) {
 			case "remove":
+				var telm=document.getElementById(target);
+				if(telm == null) {
+					console.log("Missing target element: " + target);
+					return;
+				}
 				do_remove_action(telm);
+				break;
+			case "start":
+				var telm=document.getElementById(target);
+				if(telm == null) {
+					console.log("Missing target element: " + target);
+					return;
+				}
+				do_start_action(telm);
+				break;
+			case "stop":
+				var telm=document.getElementById(target);
+				if(telm == null) {
+					console.log("Missing target element: " + target);
+					return;
+				}
+				console.log('STOP');
+				do_stop_action(telm);
+				break;
+			case "use":
+				do_use_action(target);
 				break;
 			default:
 				console.log("Action: ",action," Target: ",target);
@@ -498,21 +579,129 @@ function dispatch_click_action(e) {
 	}
 }
 
-// debug only !!!!!!!!!!!!!!!!!!!!!!!!!!!
-function sleep(ms) {
-	  return new Promise(resolve => setTimeout(resolve, ms));
+var remove_vm;
+
+function do_use_action(target) {
+var vm_name,vm_state,vm_id;
+	axios.post('/xhr-use-vm.php', {vm: target})
+	.then(function (response) {
+		if(response.data.status == 0) {
+			info_foot("ok","GOTOWE",5000);
+		} else {
+			info_foot("fail","BŁĄD: " + response.data.status + "/" + response.data.rc,8000);
+		}
+  	})
+	.catch(function (error) {
+    		console.log('error',error);
+	})
+	.then(function () {
+		vms_refresh();
+		my_vm_refresh();
+  	});
 }
 
 
-var remove_vm,remove_vm_target;
-function do_remove_action(target) {
+function do_start_action(target) {
+var vm_name,vm_state,vm_id;
 	target.style.opacity=0.3;
 	target.style.pointerEvents="none";
-	// taaaa
+	vm_name=target.getAttribute('data-vm-name');
+	vm_state=target.getAttribute('data-vm-state');
+	axios.post('/xhr-start-vm.php', {vm: vm_name})
+	.then(function (response) {
+		if(response.data.status == 0) {
+			info_foot("ok","GOTOWE",5000);
+		} else {
+			info_foot("fail","BŁĄD: " + response.data.status + "/" + response.data.rc,8000);
+		}
+  	})
+	.catch(function (error) {
+    		console.log('error',error);
+	})
+	.then(function () {
+		target.style.opacity=1;
+		target.style.pointerEvents="";
+		my_vm_refresh();
+  	});
+}
+
+
+function do_stop_action(target) {
+var vm_name,vm_state,vm_id;
+	target.style.opacity=0.3;
+	target.style.pointerEvents="none";
+	vm_name=target.getAttribute('data-vm-name');
+	vm_state=target.getAttribute('data-vm-state');
+	axios.post('/xhr-stop-vm.php', {vm: vm_name})
+	.then(function (response) {
+		if(response.data.status == 0) {
+			info_foot("ok","GOTOWE",5000);
+		} else {
+			info_foot("fail","BŁĄD: " + response.data.status + "/" + response.data.rc,8000);
+		}
+  	})
+	.catch(function (error) {
+    		console.log('error',error);
+	})
+	.then(function () {
+		target.style.opacity=1;
+		target.style.pointerEvents="";
+		my_vm_refresh();
+  	});
+}
+
+
+function do_remove_action(target) {
+var vm_name,vm_state,vm_id;
+	target.style.opacity=0.3;
+	target.style.pointerEvents="none";
+	vm_name=target.getAttribute('data-vm-name');
+	vm_state=target.getAttribute('data-vm-state');
+	vm_id=target.getAttribute('id');
+	// taaadeletea
 	remove_vm=false;
-	remove_vm_target=target;
-	$('#removeVM').on('hidden.bs.modal',do_remove_action_real);
-	$("#removeVM").modal( { show: true, backdrop: true });
+	//$('#removeVM').on('hidden.bs.modal',do_remove_action_real);
+	$('#removeVM').on('hidden.bs.modal',function(e) {
+
+		console.log('remove_vm',remove_vm);
+		console.log('target',target);
+		$('#removeVM').modal('dispose');
+		if(remove_vm) {
+			console.log('ID:',vm_id," NAME: ",vm_name, " STATE: ",vm_state);
+
+			if(vm_state != "stopped") {
+				info_foot('fail','Maszyna writualna jest uruchomiona!',4500);
+				target.style.opacity=1;
+				target.style.pointerEvents="";
+			} else {
+				document.querySelector('#reload_my_vm').classList.add("spin");
+				axios.post('/xhr-delete-vm.php', {vm: vm_name})
+				.then(function (response) {
+					if(response.data.status == 0) {
+						info_foot("ok","GOTOWE",5000);
+						target.parentNode.removeChild(target);
+					} else {
+						info_foot("fail","BŁĄD: " + response.data.status + "/" + response.data.rc,8000);
+					}
+		  		})
+				.catch(function (error) {
+	    				console.log('error',error);
+				})
+				.then(function () {
+					document.querySelector('#reload_my_vm').classList.remove("spin");
+					target.style.opacity=1;
+					target.style.pointerEvents="";
+					my_vm_refresh();
+  				});
+			}
+		} else {
+			target.style.opacity=1;
+			target.style.pointerEvents="";
+		}
+
+	});
+	$("#vmtoremove").text(vm_name + ".lxd.nauka.ga");
+	$("#removeVM").modal( { show: true, backdrop: false });
 }
 
 function do_remove_action_real(event) {
@@ -541,13 +730,17 @@ var target,vm_name,vm_state,vm_id;
 var pingme = function() {
 	axios.get('/ping.php');
 }
+axios.get('/xhr-session.php')
+.then(function(response) {
+	setInterval(pingme,180*1000);
+	var clipboard = new ClipboardJS('.clipme');
+	vms_refresh();
+	my_vm_refresh();
+})
+.catch(function (error) {
+	window.location.replace("/");
+});
 
-setInterval(pingme,180*1000);
-
-var clipboard = new ClipboardJS('.clipme');
-
-vms_refresh();
-my_vm_refresh();
 
 //clipboard.on('success', function(e) {
 //        console.log(e);
@@ -558,7 +751,7 @@ my_vm_refresh();
 </script>
 <div class="modal fade" id="removeVM" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
+    <div class="modal-content my-modal">
       <div class="modal-header">
         <h5 class="modal-title">Wymagane jest potwierdzenie</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -566,11 +759,11 @@ my_vm_refresh();
         </button>
       </div>
       <div class="modal-body">
-		Czy na pewno usunąć mszynę wirtualną <b><span id="vmtoremove"></span></b>?
+		Czy na pewno usunąć maszynę wirtualną <b><span id="vmtoremove"></span></b>?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" onClick="$('#removeVM').modal('hide');remove_vm=true;">TAK</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" style="width: 10em;">NIE</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal" style="width: 10em;">NIE</button>
       </div>
     </div>
   </div>
