@@ -439,7 +439,7 @@ var pingme = function() {
 	axios.get('/ping.php');
 }
 
-setInterval(pingme,60*1000);
+setInterval(pingme,180*1000);
 
 var clipboard = new ClipboardJS('.clipme');
 
