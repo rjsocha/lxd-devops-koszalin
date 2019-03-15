@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>devops://Koszalin</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/asset/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/asset/jquery-ui.min.css">
+  <script src="/asset/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/asset/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="/asset/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="/asset/bootstrap-confirmation.min.js"></script>
+  <script src="/asset/clipboard.min.js"></script>
+  <script src="/asset/jquery-ui.min.js"></script>
+  <script src="/asset/axios.min.js"></script>
+  <style>
+.tooltip-inner {
+    max-width: 100% !important;
+}
+.tty_container.enabled button{
+  display:none;
+}
+
+.tty_container iframe {
+  border: 1px solid lightgrey;
+  width: 100%;
+  height: 100%;
+}
+.ui-resizable-helper { border: 2px dotted #00F; }
+
+.tty_container{  padding-bottom: 18px; }
+.tty_container.enabled{ background-color: lightgrey; height: 25em; }
+.tty_container .status-bar { display: none; }
+.tty_container.enabled .status-bar { display: flex; justify-content: space-between; right: 30px; position: absolute; bottom: 3px; left: 5px; font-size: 12px; color: #555; font-weight: bold; }
+
+.red { background-color: red; color: white; }
+
+.red::placeholder { 
+ color: white;
+
+}
+
+.bg-trans {
+	transition: background-color 0.6s ease;
+}
+
+#footline {
+	transition: background-color 1.0s ease;
+}
+
+.paste-me{
+	cursor:pointer;
+}
+
+.paste-me:hover{
+	text-decoration: underline;
+}
+ 
+.clipme {
+	cursor: pointer;
+	width: 1em;
+	height: 1em;
+	vertical-align: initial;
+}
+
+.reload {
+	cursor: pointer;
+	width: 18px;
+	height: 18px;
+	vertical-align: top;
+}
+.reload.spin {
+	animation: spin 2s linear infinite;
+}
+
+.clipme:hover {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-2px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(2px, 0, 0);
+  }
+}
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  font-size: 1.5em;
+  background-color: white;
+  color: white;
+  text-align: center;
+}
+
+#vm_loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  margin: -3em 0 0 -3em;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 6em;
+  height: 6em;
+  animation: spin 2s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-bottom {
+  position: relative;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@keyframes animatebottom { 
+  from{ bottom:-100px; opacity:0 } 
+  to{ bottom:0; opacity:1 }
+}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+  <div class="navbar-brand">devops://Koszalin</div>
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/">/</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/password.php">Hasło</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout.php">Wyloguj</a>
+      </li>
+      <li class="nav-item">
+      </li>
+    </ul>
+  </div>  
+</nav>
+
+<div class="ontainer-fluid" style="margin:30px 20px;">
+  <div class="row">
+    <div class="col-sm-2">
+      <h2>Pula VM <img src="/asset/reload.svg" class="reload" id="reload_vm_pool">  </h2>
+      <ul class="nav nav-pills flex-column" id="vms">
+      </ul>
+      <div>
+  		<form  action="/createvm.php" method=post>
+    		<div class="form-group form-check-inline">
+		      <input type="text" class="form-control bg-trans" id="vm_name" placeholder="Nazwa dla VM" name="vm">
+		      &nbsp;&nbsp;
+		      <button type="submit" class="btn btn-success" id="vm_add">Nowa</button>
+		</div>
+		</form>
+	</div>
+    </div>
+    <div class="col-sm-10">
+<table class="table table-striped" id="my">
+  <tbody>
+  </tbody>
+</table>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();   
+});
+$('[data-toggle=confirmation]').confirmation({
+  rootSelector: '[data-toggle=confirmation]',
+  // other options
+});
+
+
+window.onbeforeunload = function() {
+	$(".terminal").html("");
+}
+
+newvm = document.querySelector('#vm_add');
+newvm.addEventListener('click', function(event){
+        event.stopPropagation();
+        event.preventDefault();
+	var value=document.querySelector("#vm_name").value;
+	var rx = /^[a-zA-Z][0-9a-zA-Z]+$/
+	if( value == "" || rx.test(value) == false ) {
+		setTimeout(function() {
+			document.querySelector("#vm_name").classList.remove("red");
+		},550);
+		document.querySelector("#vm_name").classList.add("red");
+		return;
+	}
+	document.querySelector('#reload_vm_pool').classList.add("spin");
+	event.target.disabled=true;
+	document.querySelector("#vm_name").disabled=true;
+	info_foot("clear");
+	axios.post('/xhr-create-vm.php', {vm: value})
+  .then(function (response) {
+    // handle success
+	  if(response.data.status == 0) {
+		info_foot("ok","GOTOWE",5000);
+	  	document.querySelector("#vm_name").value="";
+	  } else if(response.data.status == 200) {
+		  if(response.data.rc == 100) {
+		  	info_foot("fail","W tej chwili tworzona jest inna maszyna wirtualna. Spróbuj ponownie za chwilę :)",8000);
+		  } else {
+			  info_foot("fail","BACKEND ERROR " + response.data.rc,7000);
+		  }
+	  } else if(response.data.status == 102) {
+		  	info_foot("fail","istnieje już maszyna wirtualna o takiej nazwie",5000);
+	  } else {
+		  info_foot("fail","BŁĄD: " + response.data.status,8000);
+	  }
+  })
+  .catch(function (error) {
+    // handle error
+    console.log('error',error);
+  })
+  .then(function () {
+    // always executed
+	event.target.disabled=false;
+	document.querySelector("#vm_name").disabled=false;
+	document.querySelector('#reload_vm_pool').classList.remove("spin");
+	vms_refresh();
+  });
+
+});
+var vmpool_lock = 0;
+
+vmpool = document.querySelector('#reload_vm_pool');
+vmpool.addEventListener('click', function(event){
+	if(vmpool_lock)
+		return;
+	vmpool_lock=1;
+	info_foot("clear");
+	vms_refresh();
+});
+
+function vms_refresh(event) {
+	document.querySelector('#reload_vm_pool').classList.add("spin");
+	axios.get('/xhr-vms.php').then(function (response) {
+		// handle success
+		if(Array.isArray(response.data)) {
+			var arr = response.data;
+			vmhtml="";
+			for(var i=0; i<arr.length; i++) {
+				vm=arr[i];
+				vmhtml = vmhtml + '<li class="nav-item"><a class="nav-link" data-toggle="tooltip" title="' + vm.inet6 + '" data-placement="left" href="/use.php?vm=' + vm.vm + '">' + vm.vm +'</a></li>';
+			}
+			if(vmhtml.length>0) {
+				document.querySelector("#vms").innerHTML=vmhtml;
+			}
+		}
+  	}).catch(function (error) {
+    		// handle error
+	    	console.log('error',error);
+  	}).then(function () {
+	 	// always executed
+		document.querySelector('#reload_vm_pool').classList.remove("spin");
+		vmpool_lock=0;
+	 });
+}
+
+var lastvm;
+
+function my_vm_render_html(vm) {
+var vhtml;
+	vhtml  = "<td>";
+	var state;
+	state=vm.state;
+	if(state=="running") {
+		var btcolor="btn-warning";
+	} else {
+		var btcolor="btn-secondary";
+	}
+	vhtml += `<button type="button" class="btn ${btcolor} btn-lg">${vm.name}.lxd.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="${vm.name}.lxd.nauka.ga" class="clipme"> </button></br>`;
+	if(typeof vm.network != "undefined") {
+		if(typeof vm.network.inet != "undefined"  && vm.network.inet.length) {
+			for(var ip=0; ip<vm.network.inet.length; ip++) {
+				vhtml += `<h5>${vm.network.inet[ip].address}/${vm.network.inet[ip].netmask}</h5>`;
+			}
+		}
+		if(typeof vm.network.inet6 != "undefined"  && vm.network.inet6.length) {
+			for(var ip=0; ip<vm.network.inet6.length; ip++) {
+				vhtml += `<h5>${vm.network.inet6[ip].address}/${vm.network.inet6[ip].netmask} <img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.network.inet6[ip].address}"></h5>`;
+			}
+		}
+	}
+		if(typeof vm.data !== "undefined" && typeof vm.data.os !== "undefined") {
+			vhtml += `Login: <span  class="paste-me" data-command-enter="${vm.data.os.username}">${vm.data.os.username}</span> &nbsp;&nbsp;<img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.data.os.username}"></br>`;
+			vhtml += `Hasło: <b><span class="paste-me" style="color:#14c504" data-command-enter="${vm.data.os.password}">${vm.data.os.password}</span>&nbsp;&nbsp;<img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.data.os.password}"></b>`;
+		}
+	if(state == 'running') {
+	
+                vhtml += `<div class="tty_container terminal">`;
+                vhtml += `<button class="tty_open btn btn-dark " data-url="https://${vm.name}.lxd.nauka.ga:8022">TERMINAL</button>`;
+		vhtml += `<div class="status-bar"><div>${vm.name}.lxd.nauka.ga</div><div><span class="paste-me" data-command="&#12;">CLS</span></div><div><span class="paste-me" data-command="&#03;">CTRL+C</span></div><div><b><span class="paste-me" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="paste-me" data-command="fontsize:10">10</span> <span class="paste-me" data-command="fontsize:12">12</span> <span class="paste-me" data-command="fontsize:14">14</span> <span class="paste-me" data-command="fontsize:16">16</span> <span class="paste-me" data-command="fontsize:18">18</span> <span class="paste-me" data-command="fontsize:20">20</span></div></div></div>`;
+	}
+	vhtml += `<p><div class="row">`;
+	vhtml += `<div class="col">`;
+	if(state=="running") {
+		vhtml += `<a href="#" role="button" class="btn btn-primary action-triger" data-action="stop" data-action-target="${vm.id}">STOP</a>`;
+	} else {
+		vhtml += `<a href="#" role="button" class="btn btn-success action-triger" data-action="start" data-action-target="${vm.id}">START</a>`;
+	}
+	vhtml += `</div>`;
+	vhtml += `<div class="col text-right">`;
+	vhtml += `<a href="#" class="btn btn-large btn-danger action-triger" data-action="remove" data-action-target="${vm.id}">USUŃ</a>`;
+	vhtml += `</div>`;
+	vhtml += `</div></p>`;
+	vhtml += "</td>";
+
+
+	return vhtml;
+}
+
+function my_vm_render(data) {
+	var mytable = document.getElementById("my");
+	if(!mytable) {
+		console.log("missing data container");
+		return;
+	}
+	var wdata = data.slice(0);
+	var vm;
+	for(var i=0; i<wdata.length;i++) {
+		vm=wdata[i];
+		lastvm=vm;
+		if(vm.id) {
+			trow=document.getElementById(vm.id)
+			if( trow == undefined ) {
+				var newrow = mytable.insertRow(-1);
+				newrow.setAttribute('id',vm.id);
+				newrow.setAttribute('data-vm-state',vm.state);
+				newrow.setAttribute('data-vm-name',vm.name);
+				newrow.innerHTML=my_vm_render_html(vm);
+				add_click_listeners();
+				add_terminal_listeners();
+				add_paste_listeners();
+
+			}
+			console.log(vm);
+		}
+	}
+}
+
+function my_vm_refresh() {
+	axios.get('/xhr-my-vm.php').then(function (response) {
+		if(response.data) {
+			my_vm_render(response.data);
+		}
+  	}).catch(function (error) {
+    		// handle error
+	    	console.log('error',error);
+  	}).then(function () {
+	 	// always executed
+		document.querySelector('#reload_vm_pool').classList.remove("spin");
+		vmpool_lock=0;
+	 });
+}
+var info_timeout;
+	
+function info_foot(kind,msg,autoclear) {
+	var box = document.querySelector('#footline');
+	box.style.Color="white";
+	if(kind=="clear") {
+		box.style.backgroundColor="white";
+		msg = undefined;
+		if(info_timeout !== undefined) {
+			clearTimeout(info_timeout);
+			info_timeout=undefined;
+                }
+	} else if (kind=="ok") {
+		box.style.backgroundColor="#28a745";
+	} else if (kind=="fail") {
+		box.style.backgroundColor="crimson";
+	} else {
+		return;
+	}
+	if(msg) {
+		box.innerHTML=msg;
+	} else {
+		box.innerHTML="";
+	}
+	if(autoclear>0) {
+		if(info_timeout !== undefined) {
+			clearTimeout(info_timeout);
+		}
+		info_timeout=setTimeout(function() {
+			info_foot("clear");	
+		},autoclear);
+	}
+}
+
+function add_click_listeners() {
+	document.querySelectorAll(".action-triger").forEach(function(elm){
+		if(elm.getAttribute('data-on-click') !== 'true') {
+			console.log("add click listener for ",elm);
+			elm.addEventListener('click', function (e) {
+				dispatch_click_action(e);
+			});
+			elm.setAttribute('data-on-click','true');
+		}
+	});
+}
+
+function add_terminal_listeners() {
+	document.querySelectorAll(".terminal").forEach(function(elm){
+		if(elm.getAttribute('data-terminal-listen') !== 'true') {
+			console.log("add terminal listener for ",elm);
+			var btn=elm.querySelector('.tty_open');
+			btn.addEventListener('click', function (e) {
+				var iframe = null;
+    				e.stopPropagation();
+			    	e.preventDefault();
+				this.parentNode.classList.add('enabled');
+				this.parentNode.classList.add('resizable');
+				iframe = document.createElement('iframe');
+				iframe.setAttribute('src', this.getAttribute('data-url'));
+				this.parentNode.insertBefore(iframe,this);
+		 		$(".resizable" ).resizable({
+					helper: "ui-resizable-helper"
+				});
+			});
+			elm.setAttribute('data-terminal-listen','true');
+		}
+	});
+}
+
+function add_paste_listeners() {
+	document.querySelectorAll('.paste-me').forEach(function(elm){
+		var parent = elm.closest('td');
+		if(!elm.hasAttribute('data-paste-listener')) {
+			console.log("add paste listener for ",elm);
+			elm.addEventListener('click', function(e){
+				var iframe = parent.querySelector('iframe');
+				if(null !== iframe){
+					var target = iframe.contentWindow;
+	
+					if(elm.hasAttribute('data-command-enter')){
+						target.postMessage(elm.getAttribute('data-command-enter')+"\n", iframe.src);
+					}
+	
+					if(elm.hasAttribute('data-command')){
+						target.postMessage(elm.getAttribute('data-command'), iframe.src);
+					}
+				}	
+			});
+			elm.setAttribute('data-paste-listener','true');
+		}
+	});
+
+}
+
+
+function dispatch_click_action(e) {
+    	e.stopPropagation();
+    	e.preventDefault();
+	var elm = e.target;
+	var action=elm.getAttribute('data-action');
+	var target=elm.getAttribute('data-action-target');
+	if(typeof action === 'string') {
+		var telm=document.getElementById(target);
+		if(telm == null) {
+			console.log("Missing target element: " + target);
+			return;
+		}
+		switch(action) {
+			case "remove":
+				do_remove_action(telm);
+				break;
+			default:
+				console.log("Action: ",action," Target: ",target);
+		}
+	} else {
+		console.log("Missing action name");
+		console.log("dispatch",e);
+		console.log(e.target);
+	}
+}
+
+// debug only !!!!!!!!!!!!!!!!!!!!!!!!!!!
+function sleep(ms) {
+	  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+var remove_vm,remove_vm_target;
+function do_remove_action(target) {
+	target.style.opacity=0.3;
+	target.style.pointerEvents="none";
+	// taaaa
+	remove_vm=false;
+	remove_vm_target=target;
+	$('#removeVM').on('hidden.bs.modal',do_remove_action_real);
+	$("#removeVM").modal( { show: true, backdrop: true });
+}
+
+function do_remove_action_real(event) {
+var target,vm_name,vm_state,vm_id;
+	console.log('remove_vm',remove_vm);
+	console.log('remove_vm_target',remove_vm_target);
+	target=remove_vm_target;
+
+	$('#removeVM').modal('dispose');
+	if(remove_vm) {
+		vm_name=target.getAttribute('data-vm-name');
+		vm_state=target.getAttribute('data-vm-state');
+		vm_id=target.getAttribute('id');
+		console.log('ID:',vm_id," NAME: ",vm_name, " STATE: ",vm_state);
+
+		//if(vm_state != "stopped") {
+		//	info_foot('fail','Maszyna writualna jest uruchomiona!',4500);
+		//} else {
+			target.parentNode.removeChild(target);
+		//}
+	}
+	target.style.opacity=1;
+	target.style.pointerEvents="";
+}
+
+var pingme = function() {
+	axios.get('/ping.php');
+}
+
+setInterval(pingme,180*1000);
+
+var clipboard = new ClipboardJS('.clipme');
+
+vms_refresh();
+my_vm_refresh();
+
+//clipboard.on('success', function(e) {
+//        console.log(e);
+//});
+//clipboard.on('error', function(e) {
+//   console.log(e);
+//});
+</script>
+<div class="modal fade" id="removeVM" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Wymagane jest potwierdzenie</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		Czy na pewno usunąć mszynę wirtualną <b><span id="vmtoremove"></span></b>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onClick="$('#removeVM').modal('hide');remove_vm=true;">TAK</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" style="width: 10em;">NIE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+ <div class="container-fluid" id="footline">
+ </div>
+</footer>
+</body>
+</html>
