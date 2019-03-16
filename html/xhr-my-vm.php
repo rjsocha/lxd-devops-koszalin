@@ -27,6 +27,7 @@
 		$ret[$idx]['id']=md5($ret[$idx]['created_at'] . $ret[$idx]['name']);
 		if($status=="running") {
 			$has_ip6_global=0;
+			$has_ip4_global=0;
 			$ret[$idx]['data']['memory']=$vi['state']['memory'];
 			foreach($vi['state']['network'] as $net => $key) {
 				if($net == "lo" || $net == "sit0")

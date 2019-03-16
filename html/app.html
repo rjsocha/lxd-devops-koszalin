@@ -308,20 +308,20 @@ var vhtml;
 	} else {
 		var btcolor="btn-secondary";
 	}
-	vhtml += `<button type="button" class="btn ${btcolor} btn-lg">${vm.name}.lxd.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="${vm.name}.lxd.nauka.ga" class="clipme"> </button></br>`;
-	if(typeof vm.network != "undefined") {
-		if(typeof vm.network.inet != "undefined"  && vm.network.inet.length) {
-			for(var ip=0; ip<vm.network.inet.length; ip++) {
-				vhtml += `<h5>${vm.network.inet[ip].address}/${vm.network.inet[ip].netmask}</h5>`;
-			}
-		}
-		if(typeof vm.network.inet6 != "undefined"  && vm.network.inet6.length) {
-			for(var ip=0; ip<vm.network.inet6.length; ip++) {
-				vhtml += `<h5>${vm.network.inet6[ip].address}/${vm.network.inet6[ip].netmask} <img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.network.inet6[ip].address}"></h5>`;
-			}
-		}
-	}
+	vhtml += `<button type="button" class="btn ${btcolor} btn-lg">${vm.name}.lxd.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="${vm.name}.lxd.nauka.ga" class="clipme"></button> <img src="/asset/reload.svg" class="reload action-triger" id="reload_me" data-action="refresh" data-action-target="${vm.id}"></br>`;
 	if(state == 'running') {
+		if(typeof vm.network != "undefined") {
+			if(typeof vm.network.inet != "undefined"  && vm.network.inet.length) {
+				for(var ip=0; ip<vm.network.inet.length; ip++) {
+					vhtml += `<h5>${vm.network.inet[ip].address}/${vm.network.inet[ip].netmask}</h5>`;
+				}
+			}
+			if(typeof vm.network.inet6 != "undefined"  && vm.network.inet6.length) {
+				for(var ip=0; ip<vm.network.inet6.length; ip++) {
+					vhtml += `<h5>${vm.network.inet6[ip].address}/${vm.network.inet6[ip].netmask} <img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.network.inet6[ip].address}"></h5>`;
+				}
+			}
+		}
 
 		if(typeof vm.data !== "undefined" && typeof vm.data.os !== "undefined") {
 			vhtml += `Login: <span  class="paste-me" data-command-enter="${vm.data.os.username}">${vm.data.os.username}</span> &nbsp;&nbsp;<img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.data.os.username}"></br>`;
@@ -370,7 +370,7 @@ function my_vm_render(data) {
 				var newrow = mytable.insertRow(-1);
 				newrow.setAttribute('id',vm.id);
 				newrow.setAttribute('data-vm-state',vm.state);
-				console.log('                                 vm:' + vm.name);
+				//console.log('                                 vm:' + vm.name);
 				newrow.setAttribute('data-vm-name',vm.name);
 				newrow.setAttribute('data-vm-domain',vm.domain);
 				newrow.innerHTML=my_vm_render_html(vm);
@@ -383,7 +383,6 @@ function my_vm_render(data) {
 				vm_name=trow.getAttribute('data-vm-name');
 				vm_state=trow.getAttribute('data-vm-state');
 				if(vm.state!=vm_state) {
-					console.log('change state of ' + vm.name);
 					trow.innerHTML=my_vm_render_html(vm);
 					trow.setAttribute('data-vm-state',vm.state);
 					add_click_listeners();
@@ -393,7 +392,7 @@ function my_vm_render(data) {
 			}
 			//console.log(vm);
 			if(vm.state=="booting" && booting_refresh===undefined) {
-				console.log(' ############################################## seting auto refresh');
+				//console.log(' ############################################## seting auto refresh');
 				booting_refresh=setTimeout(function() {
 					booting_refresh=undefined;
 					my_vm_refresh();
@@ -475,7 +474,7 @@ function info_foot(kind,msg,autoclear) {
 function add_click_listeners() {
 	document.querySelectorAll(".action-triger").forEach(function(elm){
 		if(elm.getAttribute('data-on-click') !== 'true') {
-			console.log("add click listener for ",elm);
+			//console.log("add click listener for ",elm);
 			elm.addEventListener('click', function (e) {
 				dispatch_click_action(e);
 			});
@@ -487,7 +486,7 @@ function add_click_listeners() {
 function add_terminal_listeners() {
 	document.querySelectorAll(".terminal").forEach(function(elm){
 		if(elm.getAttribute('data-terminal-listen') !== 'true') {
-			console.log("add terminal listener for ",elm);
+			//console.log("add terminal listener for ",elm);
 			var btn=elm.querySelector('.tty_open');
 			btn.addEventListener('click', function (e) {
 				var iframe = null;
@@ -511,7 +510,7 @@ function add_paste_listeners() {
 	document.querySelectorAll('.paste-me').forEach(function(elm){
 		var parent = elm.closest('td');
 		if(!elm.hasAttribute('data-paste-listener')) {
-			console.log("add paste listener for ",elm);
+			//console.log("add paste listener for ",elm);
 			elm.addEventListener('click', function(e){
 				var iframe = parent.querySelector('iframe');
 				if(null !== iframe){
@@ -563,11 +562,17 @@ function dispatch_click_action(e) {
 					console.log("Missing target element: " + target);
 					return;
 				}
-				console.log('STOP');
 				do_stop_action(telm);
 				break;
 			case "use":
 				do_use_action(target);
+				break;
+			case "refresh":
+				var telm=document.getElementById(target);
+				if(telm !== null) {
+					telm.setAttribute('data-vm-state',"refresh");
+					my_vm_refresh();
+				}
 				break;
 			default:
 				console.log("Action: ",action," Target: ",target);
@@ -607,6 +612,7 @@ var vm_name,vm_state,vm_id;
 	target.style.pointerEvents="none";
 	vm_name=target.getAttribute('data-vm-name');
 	vm_state=target.getAttribute('data-vm-state');
+	document.querySelector('#reload_my_vm').classList.add("spin");
 	axios.post('/xhr-start-vm.php', {vm: vm_name})
 	.then(function (response) {
 		if(response.data.status == 0) {
@@ -619,6 +625,7 @@ var vm_name,vm_state,vm_id;
     		console.log('error',error);
 	})
 	.then(function () {
+		document.querySelector('#reload_my_vm').classList.remove("spin");
 		target.style.opacity=1;
 		target.style.pointerEvents="";
 		my_vm_refresh();
@@ -632,6 +639,7 @@ var vm_name,vm_state,vm_id;
 	target.style.pointerEvents="none";
 	vm_name=target.getAttribute('data-vm-name');
 	vm_state=target.getAttribute('data-vm-state');
+	document.querySelector('#reload_my_vm').classList.add("spin");
 	axios.post('/xhr-stop-vm.php', {vm: vm_name})
 	.then(function (response) {
 		if(response.data.status == 0) {
@@ -644,6 +652,7 @@ var vm_name,vm_state,vm_id;
     		console.log('error',error);
 	})
 	.then(function () {
+		document.querySelector('#reload_my_vm').classList.remove("spin");
 		target.style.opacity=1;
 		target.style.pointerEvents="";
 		my_vm_refresh();
@@ -663,11 +672,11 @@ var vm_name,vm_state,vm_id;
 	//$('#removeVM').on('hidden.bs.modal',do_remove_action_real);
 	$('#removeVM').on('hidden.bs.modal',function(e) {
 
-		console.log('remove_vm',remove_vm);
-		console.log('target',target);
+		//console.log('remove_vm',remove_vm);
+		//console.log('target',target);
 		$('#removeVM').modal('dispose');
 		if(remove_vm) {
-			console.log('ID:',vm_id," NAME: ",vm_name, " STATE: ",vm_state);
+			//console.log('ID:',vm_id," NAME: ",vm_name, " STATE: ",vm_state);
 
 			if(vm_state != "stopped") {
 				info_foot('fail','Maszyna writualna jest uruchomiona!',4500);
