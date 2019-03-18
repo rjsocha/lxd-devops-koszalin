@@ -50,17 +50,22 @@
 			}
 			$handle = fopen($ns_dir . "/vm/" . $vm, "r");
 			$vm_pass="-";
+			$vm_port=0;
 			if ($handle) {
 				while (($line = fgets($handle)) !== false) {
 					if(preg_match("/^LXD_PASS=(.+)$/",$line,$match)) {
 						$vm_pass = $match[1];
-						}
+					}
+					if(preg_match("/^LXD_PORT=(.+)$/",$line,$match)) {
+						$vm_port = $match[1];
+					}
 				}
 				fclose($handle);
 			}
 			$ret[$idx]['data']['os']['distribution']='Ubuntu 18.04 LTS';
 			$ret[$idx]['data']['os']['username']='ubuntu';
 			$ret[$idx]['data']['os']['password']=$vm_pass;
+			$ret[$idx]['terminal']=$vm_port;
 			if($has_ip6_global) { 
 				$ret[$idx]['have_ip6']=1;
 			}

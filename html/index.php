@@ -17,6 +17,17 @@
   <script src="/asset/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="/asset/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
+<style>
+.blink_me {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+</style>
 <body>
 
 <div class="container" style="margin-top: 25px">
@@ -36,7 +47,16 @@
     <button type="submit" class="btn btn-primary">Zaloguj</button>
   </form>
 
-  <center><p>client ip: <strong><?php	echo $_SERVER['REMOTE_ADDR']; ?></strong> </p></center>
+  <center>
+<?php
+	$ip =  $_SERVER['REMOTE_ADDR'];
+	if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+		echo '<p>IP: <strong>' . $_SERVER['REMOTE_ADDR'] . '</strong> </p>';
+	} else {
+		echo "<p style='font-size: 350%; color: red'><span class='blink_me'>SERIOUSLY?! IPv4???</br> $ip</span></br><small style='font-size: 15%'>(ale będzie częściowo działać ;)</small></p>";
+	}
+?>
+</center>
 </div>
 </body>
 </html>
