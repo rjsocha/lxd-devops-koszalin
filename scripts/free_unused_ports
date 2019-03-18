@@ -1,0 +1,16 @@
+#!/bin/bash
+DATADIR=~/.vm
+
+[[ ! -d $DATADIR/port ]] && mkdir -p $DATADIR/port
+
+BASEPORT=8000
+(
+	flock -w 5 -x 10 || exit 100
+	for p in {0..500}
+	do
+		((port=$BASEPORT+$p))
+		 systemctl --user is-active -q ttyd@$port
+		[[ $? -ne 0 ]] && [[ -f $DATADIR/port/$port ]] && rm $DATADIR/port/$port
+	done
+) 10>$DATADIR/.port.lock
+exit $?

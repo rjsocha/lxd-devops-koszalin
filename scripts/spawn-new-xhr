@@ -26,9 +26,13 @@ then
 		fi
 		echo "ubuntu:$pass" | /usr/bin/lxc exec $NAME chpasswd 
 		echo "LXD_PASS=$pass" >~/.vm/pool/$NAME.tmp
+		tport=$(/var/www/scripts/find_port $NAME)
+		echo "LXD_USER=ubuntu" >>~/.vm/pool/$NAME.tmp
+		echo "LXD_NAME=$NAME" >>~/.vm/pool/$NAME.tmp
+		echo "LXD_PORT=$tport" >>~/.vm/pool/$NAME.tmp
+		/usr/bin/lxc stop $NAME
 		mv ~/.vm/pool/$NAME.tmp ~/.vm/pool/$NAME
 		ln -s ~/.vm/pool/$NAME ~/.vm/free/$NAME
-		
 	) 10>~/.vm/.spawn.lock
 else
 	exit 10

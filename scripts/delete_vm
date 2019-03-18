@@ -33,6 +33,8 @@ then
 		rm ~/.vm/namespace/$NS/vm/$NAME.tmp
 		if [[ $RC -eq 0 ]]	
 		then
+			source ~/.vm/pool/$NAME
+			/var/www/scripts/free_port $LXD_PORT
 			rm ~/.vm/namespace/$NS/vm/$NAME
 			rm ~/.vm/pool/$NAME
 		else

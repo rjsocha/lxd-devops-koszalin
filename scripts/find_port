@@ -1,0 +1,27 @@
+#!/bin/bash
+DATADIR=~/.vm
+
+[[ ! -d $DATADIR/port ]] && mkdir -p $DATADIR/port
+
+BASEPORT=8000
+
+(
+	flock -w 1 -x 10 || exit 100
+	for port in {0..500}
+	do
+		((p=$BASEPORT+$port))
+		if [[ ! -f $DATADIR/port/$p ]]
+		then
+			if [[ $# -eq 1 ]]
+			then
+				echo -n $1 >$DATADIR/port/$p
+			else
+				:>$DATADIR/port/$p
+			fi
+			echo -n $p
+			exit 0
+		fi
+	done
+		
+) 10>$DATADIR/.port.lock
+exit 10

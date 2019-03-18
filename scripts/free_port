@@ -1,0 +1,25 @@
+#!/bin/bash
+DATADIR=~/.vm
+
+if [[ $# -ne 1 ]]
+then
+	exit 123
+fi
+
+port=$1
+
+
+[[ ! $port =~ ^[0-9]+$ ]] && exit 213
+
+BASEPORT=8000
+
+(
+	flock -w 1 -x 10 || exit 100
+	if [[ -f $DATADIR/port/$port ]]
+	then
+		rm $DATADIR/port/$port
+		exit 0
+	fi
+		
+) 10>$DATADIR/.port.lock
+exit $?

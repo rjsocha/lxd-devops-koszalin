@@ -29,6 +29,7 @@ then
 	(
 		flock -n 10 || exit 1
 		/usr/bin/lxc start $NAME
+		sudo /opt/koszalin/tstart $NAME
 		rm ~/.vm/namespace/$NS/vm/$NAME.tmp
 	
 	) 10>>~/.vm/namespace/$NS/vm/$NAME.tmp
