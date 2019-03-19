@@ -23,6 +23,9 @@
 
 .my-modal {
   border: 4px solid red;
+  -webkit-box-shadow: 11px 10px 20px -3px rgba(0,0,0,0.58);
+  -moz-box-shadow: 11px 10px 20px -3px rgba(0,0,0,0.58);
+  box-shadow: 11px 10px 20px -3px rgba(0,0,0,0.58);
 }
 
 .tty_container iframe {
@@ -78,8 +81,8 @@
 	animation: spin 2s linear infinite;
 }
 
-.clipme:hover {
-  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+.clipme-shake {
+  animation: shake 0.85s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
 }
@@ -198,6 +201,7 @@
 		</div>
 		</form>
 	</div>
+	<div>Masz uwagi? <a href="mailto:robert@socha.it?subject=uwagi do zero.nauka.ga">Prześlij je proszę.</a></div>
     </div>
     <div class="col-sm-10">
 	    <img src="/asset/reload.svg" class="reload" id="reload_my_vm">
@@ -328,7 +332,7 @@ var vhtml;
 	} else {
 		var btcolor="btn-secondary";
 	}
-	vhtml += `<button type="button" class="btn ${btcolor} btn hotkey">${vm.name}.lxd.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="${vm.name}.lxd.nauka.ga" class="clipme"></button> <img src="/asset/reload.svg" class="reload action-triger" id="reload_me" data-action="refresh" data-action-target="${vm.id}"></br>`;
+	vhtml += `<button type="button" class="btn ${btcolor} btn hotkey" title="Kliknij na mnie i naciśnij SHIFT+ALT+K aby aktywować moduł kursów">${vm.name}.lxd.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="${vm.name}.lxd.nauka.ga" class="clipme"></button> <img src="/asset/reload.svg" class="reload action-triger" id="reload_me" data-action="refresh" data-action-target="${vm.id}"></br>`;
 	if(state == 'running') {
 		if(typeof vm.network != "undefined") {
 			if(typeof vm.network.inet != "undefined"  && vm.network.inet.length) {
@@ -768,7 +772,7 @@ var target,vm_name,vm_state,vm_id;
 }
 function hotkey_handler(e) {
 	if(e.target.classList.contains('hotkey')) {
-		if(e.key == "K" && e.altKey && e.shiftKey && !e.ctrlKey) {
+		if((e.key == "K" || e.key == "k") && e.altKey && e.shiftKey && !e.ctrlKey) {
 			var tr=e.target.closest("tr");
 			if(tr.getAttribute('data-vm-state')=="running") {
 				if(kursy) {
@@ -864,6 +868,13 @@ axios.get('/xhr-session.php')
 	document.getElementById('zero').style.display="block";
 	setInterval(pingme,180*1000);
 	var clipboard = new ClipboardJS('.clipme');
+	clipboard.on('success', function(e) {
+	    e.trigger.classList.add('clipme-shake');
+	    setTimeout(function() {
+		    e.trigger.classList.remove('clipme-shake');
+	    },850);
+	    e.clearSelection();
+	});
 	vms_refresh();
 	my_vm_refresh();
 	hotkeys_enable();

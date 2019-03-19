@@ -1,0 +1,66 @@
+
+<h5>Wordpress</h5>
+
+</br>
+
+$ <span class="paste-me" data-command-enter="mkdir socha-wp && cd socha-wp && cat &gt;Dockerfile &lt;&lt;'EOF'
+FROM nginx
+ARG url
+RUN apt-get update && \
+apt-get install -y curl php-cli php-fpm php-mysql mysql-server php-xml php-json php-mbstring && \
+curl -s -o /usr/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+chmod +x /usr/bin/wp && \
+/etc/init.d/mysql start && \
+echo &quot;CREATE DATABASE IF NOT EXISTS wp default character set utf8;&quot; | mysql && \
+echo &quot;GRANT ALL ON wp.* TO 'wp'@'%' IDENTIFIED BY 'wordpress';&quot; | mysql && \
+mkdir /app && cd /app && wp --allow-root  core download && \
+wp --allow-root config create --dbuser=wp --dbname=wp --dbpass=wordpress --dbhost=localhost && \
+echo $url && \
+wp --allow-root core install --url=$url --title=wordpress --admin_user=admin --admin_password=admin --skip-email --admin_email=admin@admin.pl && \
+sed -i -e 's/www-data/nginx/g' /etc/php/7.0/fpm/pool.d/www.conf && \
+echo >/run.me &quot;/etc/init.d/mysql start\n/etc/init.d/php7.0-fpm start\nexec nginx -g \&quot;daemon off;\&quot;&quot; && \
+chmod +x /run.me && \
+ echo &gt;/etc/nginx/conf.d/default.conf &quot;server {\n listen 80;\n server_name _;\n location / &quot; \
+ &quot;{\n root /app;\n index index.php;\n }\n location ~* \.php$&quot; \
+ &quot;{\n fastcgi_pass unix:/run/php/php7.0-fpm.sock;\n include fastcgi_params; \n&quot; \
+ &quot; fastcgi_param SCRIPT_FILENAME /app/\$fastcgi_script_name; &quot; \
+ &quot;\n fastcgi_param SCRIPT_NAME \$fastcgi_script_name;\n } \n}&quot;
+CMD /run.me
+EOF">mkdir socha-wp && cd socha-wp && cat &gt;Dockerfile &lt;&lt;'EOF' </br>
+FROM nginx</br>
+ARG url</br>
+RUN apt-get update && \</br>
+apt-get install -y curl php-cli php-fpm php-mysql mysql-server php-xml php-json php-mbstring && \</br>
+curl -s -o /usr/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \</br>
+chmod +x /usr/bin/wp && \</br>
+/etc/init.d/mysql start && \</br<
+echo &quot;CREATE DATABASE IF NOT EXISTS wp default character set utf8;&quot; | mysql && \</br>
+echo &quot;GRANT ALL ON wp.* TO 'wp'@'%' IDENTIFIED BY 'wordpress';&quot; | mysql && \</br>
+mkdir /app && cd /app && wp --allow-root  core download && \</br>
+wp --allow-root config create --dbuser=wp --dbname=wp --dbpass=wordpress --dbhost=localhost && \</br>
+echo $url && \</br>
+wp --allow-root core install --url=$url --title=wordpress --admin_user=admin --admin_password=admin --skip-email --admin_email=admin@admin.pl && \</br>
+sed -i -e 's/www-data/nginx/g' /etc/php/7.0/fpm/pool.d/www.conf && \</br>
+echo &gt;/run.me &quot;/etc/init.d/mysql start\n/etc/init.d/php7.0-fpm start\nexec nginx -g \&quot;daemon off;\&quot;&quot; && \</br>
+chmod +x /run.me && \</br>
+echo >/etc/nginx/conf.d/default.conf &quot;server {\n listen 80;\n server_name _;\n location / &quot; \</br>
+&quot;{\n root /app;\n index index.php;\n }\n location ~* \.php$&quot; \</br>
+&quot;{\n fastcgi_pass unix:/run/php/php7.0-fpm.sock;\n include fastcgi_params; \n&quot; \</br>
+&quot; fastcgi_param SCRIPT_FILENAME /app/\$fastcgi_script_name; &quot; \</br>
+&quot;\n fastcgi_param SCRIPT_NAME \$fastcgi_script_name;\n } \n}&quot;</br>
+CMD /run.me</br>
+EOF</br>
+</span></br>
+
+Budowanie obrazu</br>
+
+$ <span class="paste-me" data-command-enter="docker build --build-arg url=http://$(hostname -f) -t socha/wp .">docker build --build-arg url=http://$(hostname -f) -t socha/wp .</span></br>
+
+</br>Uruchomienie</br>
+
+$ <span class="paste-me" data-command-enter="docker run --rm -d --name wp -p 80:80  socha/wp">docker run --rm -d --name wp -p 80:80  socha/wp</span></br>
+
+<p></p>
+<p>
+Otwórz stonę w nowej zakładcę - adres to nazwa maszyny wirtualnej. <span style="color:red">UWAGA: adres działa tylko w sieci IPv6</span>
+</p>

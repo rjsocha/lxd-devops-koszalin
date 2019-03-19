@@ -20,6 +20,7 @@ function process_kurs($dir,&$arr) {
 	return 1;
 }
 	$kursy=array();
+	$files=array();
 	if ($handle = opendir('kurs/')) {
     		while (false !== ($entry = readdir($handle))) {
 			if($entry=="." || $entry=="..") {
@@ -28,18 +29,23 @@ function process_kurs($dir,&$arr) {
 			if(!is_dir('kurs/' . $entry)) {
 				continue;
 			} else {
-				$arr=array();
-				$r=process_kurs($entry,$arr);
-				if($r) {
-					$arr['kurs']['path']="/kurs/$entry/";
-					$kursy[]=$arr;
-				}
+				$files[]=$entry;
 			}
 			
 		}
 	} else {
 		die(".... :(\n");
 	}
+	sort($files);
+	foreach($files as $entry) {
+		$arr=array();
+		$r=process_kurs($entry,$arr);
+		if($r) {
+			$arr['kurs']['path']="/kurs/$entry/";
+			$kursy[]=$arr;
+		}
+	}
+
 	if(count($kursy)) {
 		echo	json_encode($kursy);
 	}
