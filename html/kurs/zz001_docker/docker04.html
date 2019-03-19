@@ -33,7 +33,7 @@ RUN apt-get update && \</br>
 apt-get install -y curl php-cli php-fpm php-mysql mysql-server php-xml php-json php-mbstring && \</br>
 curl -s -o /usr/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \</br>
 chmod +x /usr/bin/wp && \</br>
-/etc/init.d/mysql start && \</br<
+/etc/init.d/mysql start && \</br>
 echo &quot;CREATE DATABASE IF NOT EXISTS wp default character set utf8;&quot; | mysql && \</br>
 echo &quot;GRANT ALL ON wp.* TO 'wp'@'%' IDENTIFIED BY 'wordpress';&quot; | mysql && \</br>
 mkdir /app && cd /app && wp --allow-root  core download && \</br>

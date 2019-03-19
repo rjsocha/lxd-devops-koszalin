@@ -827,13 +827,13 @@ var 	c = document.getElementById('kurs-'+id);
 		vhtml += `</div>`;
 		vhtml += `<div class="kurs-nav">`;
 		if(pos>0) {
-			vhtml += `<div><button onclick="display_kurs_page(${idx},'${id}',${pos-1});">POPRZEDNIA</button></div>`;
+			vhtml += `<div><button class="btn btn-secondary" onclick="display_kurs_page(${idx},'${id}',${pos-1});">POPRZEDNIA</button></div>`;
 		} else {
 			vhtml += `<div></div>`;
 		}
 		vhtml += `<div>STRONA ${pos+1}/${kurs.q.length}</div>`;
 		if(pos<kurs.q.length-1) {
-			vhtml += `<div><button onclick="display_kurs_page(${idx},'${id}',${pos+1});">NASTĘPNA</button></div>`;
+			vhtml += `<div><button class="btn btn-secondary" onclick="display_kurs_page(${idx},'${id}',${pos+1});">NASTĘPNA</button></div>`;
 		} else {
 			vhtml += `<div></div>`;
 		}
