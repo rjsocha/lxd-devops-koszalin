@@ -47,6 +47,11 @@
     <button type="submit" class="btn btn-primary">Zaloguj</button>
   </form>
 
+<center>
+<p>
+Ta strona używa <img src="/asset/cookie.svg" width=64 height=64> po zalogowaniu. Logując się wyrażasz zgodę na ten przykry fakt!
+</p>
+</center>
   <center>
 <?php
 	$ip =  $_SERVER['REMOTE_ADDR'];

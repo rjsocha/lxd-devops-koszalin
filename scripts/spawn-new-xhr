@@ -6,24 +6,19 @@ then
 fi
 NAME=$1
 
-if ! [[ $NAME =~ ^[a-z][-0-9a-z]*$ ]]
+if ! [[ $NAME =~ ^[a-zA-Z]([0-9a-zA-Z]){1,15}$ ]]
 then
 	echo "$NAME is wrong"
 	exit 1
 fi
-pass=$(/usr/bin/pwgen -B 8 1)
+pass=$(/usr/bin/pwgen -B 10 1)
 
 if [[ ! -f ~/.vm/pool/$NAME ]]
 then
 	(
-		flock -n 10 || exit 100
-		:>~/.vm/pool/$NAME.tmp
+		flock -w 5 -x 10 || exit 19
 		/usr/bin/lxc launch --profile ubuntu ubuntu-devops $NAME -c security.nesting=true 2>&1
-		if [[ $? -ne 0 ]]
-		then
-			rm ~/.vm/pool/$NAME.tmp
-			exit 15
-		fi
+		[[ $? -ne 0 ]] && exit 15
 		echo "ubuntu:$pass" | /usr/bin/lxc exec $NAME chpasswd 
 		echo "LXD_PASS=$pass" >~/.vm/pool/$NAME.tmp
 		tport=$(/var/www/scripts/find_port $NAME)
@@ -33,7 +28,8 @@ then
 		/usr/bin/lxc stop $NAME
 		mv ~/.vm/pool/$NAME.tmp ~/.vm/pool/$NAME
 		ln -s ~/.vm/pool/$NAME ~/.vm/free/$NAME
-	) 10>~/.vm/.spawn.lock
+		flock -u 10
+	) 10>~/.vm/.lock
 else
 	exit 10
 fi

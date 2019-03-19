@@ -1,0 +1,39 @@
+#!/bin/bash
+if [[ $# -ne 1 ]]
+then
+	echo "$0 <name>"
+	exit 1
+fi
+NAME=$1
+
+if ! [[ $NAME =~ ^[a-zA-Z]([0-9a-zA-Z]){1,15}$ ]]
+then
+	echo "$NAME is wrong"
+	exit 1
+fi
+
+if [[ -f ~/.vm/pool/$NAME ]]
+then
+	(
+		flock -n 10 || exit 19
+		source ~/.vm/pool/$NAME
+		if [[ "$LXD_NS" != "" ]]
+		then
+			echo "VM $NAME has a NS"
+			exit 122
+		fi
+		/usr/bin/lxc delete $NAME --force
+	       	RC=$?
+		if [[ $RC -eq 0 ]]	
+		then
+			/var/www/scripts/free_port $LXD_PORT
+			[[ -L ~/.vm/free/$NAME ]] && rm ~/.vm/free/$NAME
+			rm ~/.vm/pool/$NAME
+		else
+			exit 23
+		fi
+	) 10>~/.vm/.lock
+else
+	echo "VM IS NOT AVAILIBLE"
+	exit 10
+fi

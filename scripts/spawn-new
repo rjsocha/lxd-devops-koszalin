@@ -1,4 +1,5 @@
 #!/bin/bash
+exit 233
 if [[ $# -ne 1 ]]
 then
 	echo "$0 <name>"
@@ -6,7 +7,7 @@ then
 fi
 NAME=$1
 
-if ! [[ $NAME =~ ^[a-z][-0-9a-z]*$ ]]
+if ! [[ $NAME =~ ^[a-zA-Z]([0-9a-zA-Z]){1,15}$ ]]
 then
 	echo "$NAME is wrong"
 	exit 1
@@ -18,17 +19,13 @@ then
 	(
 		flock -n 10 || exit 1
 		/usr/bin/lxc launch --profile ubuntu ubuntu-devops $NAME 2>&1
-		if [[ $? -ne 0 ]]
-		then
-			rm ~/.vm/pool/$NAME.tmp
-			exit 15
-		fi
+		[[ $? -ne 0 ]] && exit 15
 		echo "ubuntu:$pass" | /usr/bin/lxc exec $NAME chpasswd 
 		echo "LXD_PASS=$pass" >~/.vm/pool/$NAME.tmp
 		mv ~/.vm/pool/$NAME.tmp ~/.vm/pool/$NAME
 		ln -s ~/.vm/pool/$NAME ~/.vm/free/$NAME
 		
-	) 10>>~/.vm/pool/$NAME.tmp
+	) 10>>~/.vm/.lock
 else
 	exit 10
 fi

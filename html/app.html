@@ -250,7 +250,7 @@ newvm.addEventListener('click', function(event){
 		info_foot("ok","GOTOWE",5000);
 	  	document.querySelector("#vm_name").value="";
 	  } else if(response.data.status == 200) {
-		  if(response.data.rc == 100) {
+		  if(response.data.rc == 19) {
 		  	info_foot("fail","W tej chwili tworzona jest inna maszyna wirtualna. Spróbuj ponownie za chwilę :)",8000);
 		  } else {
 			  info_foot("fail","BACKEND ERROR " + response.data.rc,7000);

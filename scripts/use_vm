@@ -7,7 +7,7 @@ fi
 NAME=$1
 NS=$2
 
-if ! [[ $NAME =~ ^[a-z][-0-9a-z]*$ ]]
+if ! [[ $NAME =~ ^[a-zA-Z]([0-9a-zA-Z]){1,15}$ ]]
 then
 	echo "$NAME is wrong"
 	exit 1
@@ -21,11 +21,10 @@ fi
 if [[ -L ~/.vm/free/$NAME ]]
 then
 	(
-		flock -n 10 || exit 1
+		flock -w 15 -x 10 || exit 19
 		mv ~/.vm/free/$NAME ~/.vm/namespace/$NS/vm
-		rm ~/.vm/free/$NAME.tmp
-	
-	) 10>>~/.vm/free/$NAME.tmp
+		echo "LXD_NS=$NS" >>~/.vm/pool/$NAME
+	) 10>>~/.vm/.use.lock
 else
 	echo "VM IS NOT AVAILIBLE"
 	exit 10

@@ -1,4 +1,5 @@
 <?php
+	die();
 	session_start();
 	if(!isset($_SESSION['namespace'])) {
 		header('Location: /');

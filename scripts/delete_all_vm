@@ -1,0 +1,19 @@
+#!/bin/bash
+DATADIR=~/.vm
+(
+	flock -w 30 -x  10 || exit 100
+	for vm in $(find $DATADIR/pool -type f -printf "%f\n")
+	do
+		unset LXD_NS
+		source $DATADIR/pool/$vm	
+		echo -n "$vm "
+		if [[ "$LXD_NS" != "" ]]
+		then
+			./delete_vm $vm $LXD_NS
+		else
+			./delete_pool_vm $vm
+		fi
+	done
+	echo
+) 10>~/.vm/.delete.lock
+exit $?

@@ -1,0 +1,19 @@
+#!/bin/bash
+DATADIR=~/.vm
+(
+	flock -w 30 -x  10 || exit 100
+	for vm in $(find $DATADIR/pool -type f -printf "%f\n")
+	do
+		[[ $vm =~ \.tmp$ ]] && continue;
+		unset LXD_NS
+		source $DATADIR/pool/$vm	
+		if [[ "$LXD_NS" != "" ]]
+		then
+			echo "$vm ($(cat $DATADIR/namespace/$LXD_NS/email))"
+		else
+			echo $vm
+		fi
+	done
+	flock -u 10
+) 10>~/.vm/.list.lock
+exit $?

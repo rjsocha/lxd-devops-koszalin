@@ -7,7 +7,7 @@ fi
 NAME=$1
 NS=$2
 
-if ! [[ $NAME =~ ^[a-z][-0-9a-z]*$ ]]
+if ! [[ $NAME =~ ^[a-zA-Z]([0-9a-zA-Z]){1,15}$ ]]
 then
 	echo "$NAME is wrong"
 	exit 1
@@ -27,12 +27,11 @@ fi
 if [[ -L ~/.vm/namespace/$NS/vm/$NAME ]]
 then
 	(
-		flock -n 10 || exit 1
+		flock -w 5 -x 10 || exit 19
 		/usr/bin/lxc start $NAME
 		sudo /opt/koszalin/tstart $NAME
-		rm ~/.vm/namespace/$NS/vm/$NAME.tmp
 	
-	) 10>>~/.vm/namespace/$NS/vm/$NAME.tmp
+	) 10>~/.lock
 else
 	echo "VM IS NOT AVAILIBLE"
 	exit 10
