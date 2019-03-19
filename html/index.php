@@ -16,7 +16,6 @@
   <script src="/asset/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="/asset/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="/asset/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-</head>
 <style>
 .blink_me {
   animation: blinker 1s linear infinite;
@@ -28,6 +27,7 @@
   }
 }
 </style>
+</head>
 <body>
 
 <div class="container" style="margin-top: 25px">
