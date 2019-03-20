@@ -54,7 +54,7 @@ EOF</br>
 
 Budowanie obrazu</br>
 
-$ <span class="paste-me" data-command-enter="docker build --build-arg url=http://$(hostname -f) -t socha/wp .">docker build --build-arg url=http://$(hostname -f) -t socha/wp .</span></br>
+$ <span class="paste-me" data-command-enter="docker build --build-arg url=http://{ME} -t socha/wp .">docker build --build-arg url=http://{ME} -t socha/wp .</span></br>
 
 </br>Uruchomienie</br>
 
@@ -62,5 +62,7 @@ $ <span class="paste-me" data-command-enter="docker run --rm -d --name wp -p 80:
 
 <p></p>
 <p>
-Otwórz stonę w nowej zakładcę - adres to nazwa maszyny wirtualnej. <span style="color:red">UWAGA: adres działa tylko w sieci IPv6</span>
+Otwórz stonę w nowej zakładcę - adres to nazwa maszyny wirtualnej. <span style="color:red">UWAGA: adres działa tylko w sieci IPv6</span></br>
+</br>
+<a href="http://{ME}/" target="_blank">http://{ME}</a> (strona powinna otworzyć się w nowym oknie)
 </p>

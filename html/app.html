@@ -222,9 +222,9 @@ $('[data-toggle=confirmation]').confirmation({
 });
 
 
-window.onbeforeunload = function() {
-	$(".terminal").html("");
-}
+//window.onbeforeunload = function() {
+//	//$(".terminal").html("");
+//}
 
 newvm = document.querySelector('#vm_add');
 newvm.addEventListener('click', function(event){
@@ -807,7 +807,7 @@ var kurs;
 		display_kurs_page(idx,id,0);
 	}
 }
-
+var klop;
 function display_kurs_page(idx,id,pos) {
 var	vhtml,kurs;
 var 	c = document.getElementById('kurs-'+id);
@@ -820,7 +820,11 @@ var 	c = document.getElementById('kurs-'+id);
 	vhtml += `<div><h6>${kurs.kurs.description}</h4></div>`;
 	vhtml += `<p><div class="conintaner-fluid kurs-container">`;
 	axios.get(kurs.kurs.path + kurs.q[pos]+'?' + Math.floor(Math.random()*1000)).then(function(response){
-		vhtml += response.data;
+		var trow=document.getElementById(id);
+		var fqdm = trow.getAttribute('data-vm-name') + "." + trow.getAttribute('data-vm-domain');
+		// replace all
+		var macro = response.data.replace(new RegExp("{ME}", 'g'),fqdm);
+		vhtml += macro;
 	}).catch(function(e) {
 		vhtml += `<h3>Błąd ładowania strony kursu</h3>`;
 	}).then(function() {
