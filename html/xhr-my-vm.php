@@ -1,11 +1,16 @@
 <?php
 	require('f.php');
-	session_start();
-	if(!isset($_SESSION['namespace'])) {
-		header('HTTP/1.0 403 Forbidden');
-		die();
+	if (php_sapi_name() == "cli") {
+		$ns="dc5b6d53989e58c864f247f44539d5b3"; // socha@socha.it
+	} else {
+		session_start();
+		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+		if(!isset($_SESSION['namespace'])) {
+			header('HTTP/1.0 403 Forbidden');
+			die();
+		}
+		$ns=$_SESSION['namespace'];
 	}
-	$ns=$_SESSION['namespace'];
 	$ns_dir = "/home/socha/.vm/namespace/" . $ns;
 
 	$p=get_pool($ns);
