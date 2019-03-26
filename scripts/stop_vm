@@ -28,7 +28,7 @@ if [[ -L ~/.vm/namespace/$NS/vm/$NAME ]]
 then
 	(
 		flock -w 5 -x 10 || exit 19
-                sudo /opt/koszalin/tstop $NAME 
+                sudo /var/www/system/bin/tstop $NAME 
 		/usr/bin/lxc stop $NAME
 	
 	) 10>~/.vm/.lock

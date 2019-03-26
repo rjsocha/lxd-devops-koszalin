@@ -29,7 +29,7 @@ then
 	(
 		flock -w 5 -x 10 || exit 19
 		/usr/bin/lxc start $NAME
-		sudo /opt/koszalin/tstart $NAME
+		sudo /var/www/system/bin/tstart $NAME
 	
 	) 10>~/.lock
 else
