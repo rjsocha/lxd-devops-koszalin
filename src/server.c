@@ -344,6 +344,7 @@ main(int argc, char **argv) {
                 break;
             case 'S':
                 ssl = true;
+		info.options |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
                 break;
             case 'C':
                 strncpy(cert_path, optarg, sizeof(cert_path) - 1);
@@ -432,11 +433,13 @@ main(int argc, char **argv) {
                 "!DHE-RSA-AES256-SHA256:"
                 "!AES256-GCM-SHA384:"
                 "!AES256-SHA256";
+	/*
         if (strlen(info.ssl_ca_filepath) > 0)
             info.options |= LWS_SERVER_OPTION_REQUIRE_VALID_OPENSSL_CLIENT_CERT;
 #if LWS_LIBRARY_VERSION_MAJOR >= 2
         info.options |= LWS_SERVER_OPTION_REDIRECT_HTTP_TO_HTTPS;
 #endif
+	*/
     }
 
     lwsl_notice("ttyd %s (libwebsockets %s)\n", TTYD_VERSION, LWS_LIBRARY_VERSION);

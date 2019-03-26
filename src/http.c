@@ -117,6 +117,12 @@ callback_http(struct lws *wsi, enum lws_callback_reasons reason, void *user, voi
             }
 
             const char* content_type = "text/html";
+	    const char* add_hdr_name1  = "X-Frame-Options:";
+	    const char* add_hdr_name2  = "Content-Security-Policy:";
+	    //const char* add_hdr_value1 = "ALLOW-FROM https://zero.nauka.ga/";
+	    const char* add_hdr_value1 = "SAMEORIGIN";
+	    const char* add_hdr_value2 = "frame-ancestors zero.nauka.ga";
+
             if (server->index != NULL) {
                 int n = lws_serve_http_file(wsi, server->index, content_type, NULL, 0);
                 if (n < 0 || (n > 0 && lws_http_transaction_completed(wsi)))
@@ -128,6 +134,10 @@ callback_http(struct lws *wsi, enum lws_callback_reasons reason, void *user, voi
                     return 1;
                 if (lws_add_http_header_content_length(wsi, (unsigned long) index_html_len, &p, end))
                     return 1;
+		if (lws_add_http_header_by_name(wsi,add_hdr_name1, add_hdr_value1, strlen(add_hdr_value1),&p,end))
+			return 1;
+		if (lws_add_http_header_by_name(wsi,add_hdr_name2, add_hdr_value2, strlen(add_hdr_value2),&p,end))
+			return 1;
                 if (lws_finalize_http_header(wsi, &p, end))
                     return 1;
                 if (lws_write(wsi, buffer + LWS_PRE, p - (buffer + LWS_PRE), LWS_WRITE_HTTP_HEADERS) < 0)

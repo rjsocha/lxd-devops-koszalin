@@ -5,10 +5,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const ASSET_PATH = process.env.ASSET_PATH || '';
 
 module.exports = merge(config, {
     mode: 'production',
-    optimization: {
+    output: {
+		      publicPath: ASSET_PATH
+    },
+     optimization: {
         minimizer: [
             new UglifyJsPlugin({
                 cache: true,
@@ -23,7 +27,6 @@ module.exports = merge(config, {
                 removeComments: true,
                 collapseWhitespace: true,
             },
-            inlineSource: '.(js|css)$',
             template: 'index.html',
         }),
         new HtmlWebpackInlineSourcePlugin(),

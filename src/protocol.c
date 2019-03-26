@@ -44,7 +44,7 @@ send_initial_message(struct lws *wsi, int index) {
     switch(cmd) {
         case SET_WINDOW_TITLE:
             gethostname(buffer, sizeof(buffer) - 1);
-            n = sprintf((char *) p, "%c%s (%s)", cmd, server->command, buffer);
+	    n = sprintf((char *) p, "%c%s.lxd.nauka.ga", cmd, buffer);
             break;
         case SET_RECONNECT:
             n = sprintf((char *) p, "%c%d", cmd, server->reconnect);

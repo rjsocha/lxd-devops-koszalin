@@ -239,7 +239,7 @@ var openWs = function() {
     ws.binaryType = 'arraybuffer';
 
     ws.onopen = function(event) {
-        console.log('Websocket connection opened');
+        //console.log('Websocket connection opened');
         wsError = false;
         sendMessage(JSON.stringify({AuthToken: authToken}));
 
@@ -250,20 +250,21 @@ var openWs = function() {
         // expose term handle for some programatic cases
         // which need to get the content of the terminal
         term = window.term = new Terminal({
-            fontSize: 13,
+            fontSize: 14,
             fontFamily: '"Menlo for Powerline", Menlo, Consolas, "Liberation Mono", Courier, monospace',
             theme: {
-                foreground: '#d2d2d2',
-                background: '#2b2b2b',
+                foreground: '#000000',
+                background: '#ffffff',
+		selection: 'rgba(180,180,180,0.4)',
                 cursor: '#adadad',
                 black: '#000000',
                 red: '#d81e00',
-                green: '#5ea702',
+                green: '#1b9e1b',
                 yellow: '#cfae00',
-                blue: '#427ab3',
+                blue: '#121af3',
                 magenta: '#89658e',
                 cyan: '#00a7aa',
-                white: '#dbded8',
+                white: '#f1f1f1',
                 brightBlack: '#686a66',
                 brightRed: '#f54235',
                 brightGreen: '#99e343',
@@ -271,7 +272,7 @@ var openWs = function() {
                 brightBlue: '#84b0d8',
                 brightMagenta: '#bc94b7',
                 brightCyan: '#37e6e8',
-                brightWhite: '#f1f1f0'
+                brightWhite: '#ffffff'
             }
         });
 
@@ -286,7 +287,7 @@ var openWs = function() {
 
         term.on('title', function (data) {
             if (data && data !== '') {
-                document.title = (data + ' | ' + title);
+                document.title = (title);
             }
         });
 
@@ -304,6 +305,21 @@ var openWs = function() {
             }, 250);
         });
         window.addEventListener('beforeunload', unloadCallback);
+	
+	window.addEventListener("message", function(e){
+		if (e.origin !== "https://zero.nauka.ga") {
+			console.log('origin !== https://zero.nauka.ga');
+	    		return;
+		}
+		var fnts=/^fontsize:([0-9]+)$/;
+		if(fnts.test(e.data) === true) {
+                    	term.setOption("fontSize", fnts.exec(e.data)[1]);
+			term.fit();
+		} else {
+			sendData(e.data);
+			term.focus();
+		}
+	}, false);
 
         term.open(terminalContainer, true);
         term.winptyCompatInit();
@@ -337,7 +353,7 @@ var openWs = function() {
                 break;
             case '3':
                 autoReconnect = JSON.parse(textDecoder.decode(data));
-                console.log('Enabling reconnect: ' + autoReconnect + ' seconds');
+                //console.log('Enabling reconnect: ' + autoReconnect + ' seconds');
                 break;
             default:
                 console.log('Unknown command: ' + cmd);
@@ -351,7 +367,7 @@ var openWs = function() {
             term.off('data');
             term.off('resize');
             if (!wsError) {
-                term.showOverlay('Connection Closed', null);
+                term.showOverlay('Sesja zakończona', null);
             }
         }
         window.removeEventListener('beforeunload', unloadCallback);
