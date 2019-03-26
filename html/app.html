@@ -39,7 +39,8 @@
 .tty_container.enabled{ background-color: lightgrey; height: 25em; }
 .tty_container .status-bar { display: none; }
 .tty_container.enabled .status-bar { display: flex; justify-content: space-between; right: 30px; position: absolute; bottom: 3px; left: 5px; font-size: 12px; color: #555; font-weight: bold; }
-
+.tty_container .kurs { 	display: none; }
+.tty_container.enabled .kurs { 	display: block; }
 
 .red { background-color: red; color: white; }
 
@@ -86,14 +87,7 @@
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
 }
-
-.kurs {
-	display: none;
-}
-
-.kurs_visible {
-	display: block;
-}
+.kurs {  display: none; }
 
 .kurs-container {
 	border: 1px solid rgba(0,0,0,0.34);
@@ -364,8 +358,20 @@ var vhtml;
                 vhtml += `<div class="tty_container terminal">`;
 		vhtml += `<button class="tty_open btn btn-dark" data-url="https://zero.nauka.ga:${vm.terminal}">TERMINAL</button>`;
 		vhtml += `<div class="status-bar"><div>${vm.name}.lxd.nauka.ga</div><div><span class="paste-me" data-command="&#12;">CLS</span></div><div><span class="paste-me" data-command="&#03;">CTRL+C</span></div><div><b><span class="paste-me" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="paste-me" data-command="fontsize:10">10</span> <span class="paste-me" data-command="fontsize:12">12</span> <span class="paste-me" data-command="fontsize:14">14</span> <span class="paste-me" data-command="fontsize:16">16</span> <span class="paste-me" data-command="fontsize:18">18</span> <span class="paste-me" data-command="fontsize:20">20</span></div></div></div>`;
+		vhtml += `<div class="row kurs" id="kurs-c-${vm.id}">`;
+		if(kursy) {
+			vhtml += `<div class="col container-fluid" width="100%">`;
+			vhtml += `<p></p><p><select name="kurs" id="select-${vm.id}">`;
+			for(var i=0;i<kursy.length;i++) {
+			       vhtml += `<option value="${i}">${kursy[i].kurs.title}</option>`;
+			}
+			vhtml += `</select>`;
+			vhtml += ` <input type="submit" value="Uruchom kurs"  id="submit-${vm.id}" onclick="select_kurs_id('${vm.id}')"></p>`;
+			vhtml += `<p><div id="kurs-${vm.id}"></div></p>`
+			vhtml += `</div>`;
+		}
+		vhtml += `</div>`;
 	}
-	vhtml += `<div class="kurs">mamy kurs</div>`;
 	vhtml += `<p><div class="row">`;
 	vhtml += `<div class="col">`;
 	if(state=="running") {
@@ -529,6 +535,9 @@ function add_terminal_listeners() {
 			    	e.preventDefault();
 				this.parentNode.classList.add('enabled');
 				this.parentNode.classList.add('resizable');
+				var tr= this.parentNode.closest('tr');
+				var id=tr.getAttribute('id');
+				document.getElementById(`kurs-c-${id}`).classList.remove('kurs');
 				iframe = document.createElement('iframe');
 				iframe.setAttribute('src', this.getAttribute('data-url'));
 				this.parentNode.insertBefore(iframe,this);
@@ -795,6 +804,15 @@ function hotkey_handler(e) {
 	}
 }
 
+function select_kurs_id(id) {
+var kurs;
+	var idx=document.getElementById('select-'+id).selectedIndex;
+	kurs=kursy[idx];
+	if(kursy[idx].q.length>0) {
+		display_kurs_page(idx,id,0);
+	}
+}
+
 function select_kurs(e) {
 var kurs;
 	if(!e.target.id.substring(0,7)=="submit-") {
@@ -807,7 +825,6 @@ var kurs;
 		display_kurs_page(idx,id,0);
 	}
 }
-var klop;
 function display_kurs_page(idx,id,pos) {
 var	vhtml,kurs;
 var 	c = document.getElementById('kurs-'+id);
@@ -815,7 +832,7 @@ var 	c = document.getElementById('kurs-'+id);
 		return;
 	vhtml="";
 	kurs=kursy[idx];
-	vhtml += `<p><div class="conintaner-fluid" style="padding: 12px;">`;
+	vhtml += `<p><div class="conintaner-fluid" style="padding: 12px; width:100%">`;
 	vhtml += `<div><h4>${kurs.kurs.title}</h4></div>`;
 	vhtml += `<div><h6>${kurs.kurs.description}</h4></div>`;
 	vhtml += `<p><div class="conintaner-fluid kurs-container">`;
