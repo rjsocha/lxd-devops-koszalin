@@ -1,0 +1,20 @@
+#!/bin/bash
+
+[[ $# -ne 1 ]] && exit 100
+
+DATADIR=~/.vm
+
+vm=$1
+
+if [[ -f  $DATADIR/pool/$vm ]]
+then
+	source $DATADIR/pool/$vm
+	/usr/bin/lxc info $LXD_NAME | grep "^Status:" | grep -q -i "running"
+	if [[ $? -eq 0 ]]
+	then
+		exec /usr/local/bin/ttyd  -p $LXD_PORT -S -r 2 -6 -C ~/.acme.sh/zero.nauka.ga/fullchain.cer -K ~/.acme.sh/zero.nauka.ga/zero.nauka.ga.key -A /etc/ssl/certs/ca-certificates.crt /usr/bin/lxc exec $LXD_NAME /bin/login
+	fi
+	exit 10
+else
+	exit 99
+fi

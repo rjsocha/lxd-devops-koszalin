@@ -1,0 +1,2 @@
+socha ALL=(ALL) NOPASSWD:/var/www/system/bin/tstart
+socha ALL=(ALL) NOPASSWD:/var/www/system/bin/tstop

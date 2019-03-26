@@ -1,0 +1,10 @@
+[Unit]
+Description=WebSocekt Terminal
+
+[Service]
+User=socha
+Group=socha
+ExecStart=/var/www/system/bin/terminal %i
+RestartSec=5
+KillMode=process
+Restart=always
