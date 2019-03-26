@@ -13,3 +13,5 @@ lxc image delete ubuntu-devops
 
 lxc publish template --alias ubuntu-devops
 
+#### Merge lws i ttyd
+https://help.github.com/en/articles/about-git-subtree-merges
