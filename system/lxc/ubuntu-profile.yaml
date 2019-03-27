@@ -1,0 +1,18 @@
+config:
+  user.user-data: |
+    #cloud-config
+    ssh_authorized_keys:
+      - ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBMD87NjoD28p0O70cwSwUd0Mkf/rjcoDrTieYIbgaIq2rJ3V157/Dup/EqFqKRwAP/vb3JwB+7aimBfR0UZ6dNje7bzbCjcrLQxdJUvJZbhlUjT0tXoNaoltlewPrYKltg== robert-socha-2019-ecdsa
+    runcmd:
+      - usermod -U ubuntu
+description: Ubuntu LXD profile for linux.nauka.ga
+devices:
+  eth0:
+    name: eth0
+    nictype: bridged
+    parent: lxdbr0
+    type: nic
+  root:
+    path: /
+    pool: default
+    type: disk
