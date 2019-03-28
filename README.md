@@ -22,7 +22,7 @@ https://help.github.com/en/articles/about-git-subtree-merges
 Dirty way, very dirty. Hardcoded paths, hardcoded username (socha)
 
 ```
-apt-get install -y build-essential make git cmake libssl-dev zlib1g-dev libjson-c-dev pkg-config curl socat php-fpm  php-json  php-mbstring  php-xml  php-intl php-cli
+sudo apt-get install -y build-essential make git cmake libssl-dev zlib1g-dev libjson-c-dev pkg-config curl socat php-fpm  php-json  php-mbstring  php-xml  php-intl php-cli pwgen
 mkdir /var/www
 cd /var/www
 git clone git@github.com:rjsocha/lxd-devops-koszalin.git .
@@ -59,10 +59,9 @@ sudo install /dev/null /etc/php/7.2/fpm/pool.d/www.conf
 sudo install -m 0644 /var/www/system/php-fpm/socha.conf /etc/php/7.2/fpm/pool.d/socha.conf
 sudo install -o socha -g socha -m 755 -d /var/log/php
 sudo service php7.2-fpm restart
-
-
-
-
+lxc profile create ubuntu
+cat /var/www/system/lxc/ubuntu-profile.yaml | lxc profile edit ubuntu
+lxc profile edit ubuntu
 ```
 
 
