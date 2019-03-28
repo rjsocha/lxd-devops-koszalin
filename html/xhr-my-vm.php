@@ -26,7 +26,7 @@
 		$ret[$idx]['have_ip4']=0;
 		$ret[$idx]['name']=$vm;
 		$ret[$idx]['state']=$status;
-		$ret[$idx]['domain']='lxd.nauka.ga';
+		$ret[$idx]['domain']='vm.nauka.ga';
 		$ret[$idx]['architecture']=$vi['architecture'];
 		$ret[$idx]['created_at']=strtotime($vi['created_at']);
 		$ret[$idx]['id']=md5($ret[$idx]['created_at'] . $ret[$idx]['name']);

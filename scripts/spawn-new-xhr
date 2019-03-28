@@ -11,6 +11,10 @@ then
 	echo "$NAME is wrong"
 	exit 1
 fi
+
+[[ ! -d ~/.vm/pool ]] && mkdir -p ~/.vm/pool
+[[ ! -d ~/.vm/free ]] && mkdir -p ~/.vm/free
+
 pass=$(/usr/bin/pwgen -B 10 1)
 
 if [[ ! -f ~/.vm/pool/$NAME ]]

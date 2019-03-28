@@ -307,8 +307,8 @@ var openWs = function() {
         window.addEventListener('beforeunload', unloadCallback);
 	
 	window.addEventListener("message", function(e){
-		if (e.origin !== "https://zero.nauka.ga") {
-			console.log('origin !== https://zero.nauka.ga');
+		if (e.origin !== "https://linux.nauka.ga") {
+			console.log('origin !== https://linux.nauka.ga');
 	    		return;
 		}
 		var fnts=/^fontsize:([0-9]+)$/;

@@ -12,7 +12,7 @@ then
 	/usr/bin/lxc info $LXD_NAME | grep "^Status:" | grep -q -i "running"
 	if [[ $? -eq 0 ]]
 	then
-		exec /usr/local/bin/ttyd  -p $LXD_PORT -S -r 2 -6 -C ~/.acme.sh/zero.nauka.ga/fullchain.cer -K ~/.acme.sh/zero.nauka.ga/zero.nauka.ga.key -A /etc/ssl/certs/ca-certificates.crt /usr/bin/lxc exec $LXD_NAME /bin/login
+		exec /usr/local/bin/ttyd  -p $LXD_PORT -S -r 2 -6 -C ~/.acme.sh/linux.nauka.ga/fullchain.cer -K ~/.acme.sh/linux.nauka.ga/linux.nauka.ga.key -A /etc/ssl/certs/ca-certificates.crt /usr/bin/lxc exec $LXD_NAME /bin/login
 	fi
 	exit 10
 else

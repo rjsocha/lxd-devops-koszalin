@@ -195,7 +195,7 @@
 		</div>
 		</form>
 	</div>
-	<div>Masz uwagi? <a href="mailto:robert@socha.it?subject=uwagi do zero.nauka.ga">Prześlij je proszę.</a></div>
+	<div>Masz uwagi? <a href="mailto:robert@socha.it?subject=uwagi do linux.nauka.ga">Prześlij je proszę.</a></div>
     </div>
     <div class="col-sm-10">
 	    <img src="/asset/reload.svg" class="reload" id="reload_my_vm">
@@ -326,7 +326,7 @@ var vhtml;
 	} else {
 		var btcolor="btn-secondary";
 	}
-	vhtml += `<button type="button" class="btn ${btcolor} btn hotkey" title="Kliknij na mnie i naciśnij SHIFT+ALT+K aby aktywować moduł kursów">${vm.name}.lxd.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="${vm.name}.lxd.nauka.ga" class="clipme"></button> <img src="/asset/reload.svg" class="reload action-triger" id="reload_me" data-action="refresh" data-action-target="${vm.id}"></br>`;
+	vhtml += `<button type="button" class="btn ${btcolor} btn">${vm.name}.vm.nauka.ga <img src="/asset/clip.svg" data-clipboard-text="${vm.name}.vm.nauka.ga" class="clipme"></button> <img src="/asset/reload.svg" class="reload action-triger" id="reload_me" data-action="refresh" data-action-target="${vm.id}"></br>`;
 	if(state == 'running') {
 		if(typeof vm.network != "undefined") {
 			if(typeof vm.network.inet != "undefined"  && vm.network.inet.length) {
@@ -356,8 +356,8 @@ var vhtml;
 			vhtml += `Hasło: <b><span class="paste-me" style="color:#14c504" data-command-enter="${vm.data.os.password}">${vm.data.os.password}</span>&nbsp;&nbsp;<img src="/asset/clip.svg" class="clipme" data-clipboard-text="${vm.data.os.password}"></b>`;
 		}
                 vhtml += `<div class="tty_container terminal">`;
-		vhtml += `<button class="tty_open btn btn-dark" data-url="https://zero.nauka.ga:${vm.terminal}">TERMINAL</button>`;
-		vhtml += `<div class="status-bar"><div>${vm.name}.lxd.nauka.ga</div><div><span class="paste-me" data-command="&#12;">CLS</span></div><div><span class="paste-me" data-command="&#03;">CTRL+C</span></div><div><b><span class="paste-me" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="paste-me" data-command="fontsize:10">10</span> <span class="paste-me" data-command="fontsize:12">12</span> <span class="paste-me" data-command="fontsize:14">14</span> <span class="paste-me" data-command="fontsize:16">16</span> <span class="paste-me" data-command="fontsize:18">18</span> <span class="paste-me" data-command="fontsize:20">20</span></div></div></div>`;
+		vhtml += `<button class="tty_open btn btn-dark" data-url="${window.location.origin}:${vm.terminal}">TERMINAL</button>`;
+		vhtml += `<div class="status-bar"><div>${vm.name}.vm.nauka.ga</div><div><span class="paste-me" data-command="&#12;">CLS</span></div><div><span class="paste-me" data-command="&#03;">CTRL+C</span></div><div><b><span class="paste-me" data-command="&#04;">CTRL+D</span> </b> </div> <div><span class="paste-me" data-command="fontsize:10">10</span> <span class="paste-me" data-command="fontsize:12">12</span> <span class="paste-me" data-command="fontsize:14">14</span> <span class="paste-me" data-command="fontsize:16">16</span> <span class="paste-me" data-command="fontsize:18">18</span> <span class="paste-me" data-command="fontsize:20">20</span></div></div></div>`;
 		vhtml += `<div class="row kurs" id="kurs-c-${vm.id}">`;
 		if(kursy) {
 			vhtml += `<div class="col container-fluid" width="100%">`;
@@ -753,7 +753,7 @@ var vm_name,vm_state,vm_id;
 		}
 
 	});
-	$("#vmtoremove").text(vm_name + ".lxd.nauka.ga");
+	$("#vmtoremove").text(vm_name + ".vm.nauka.ga");
 	$("#removeVM").modal( { show: true, backdrop: false });
 }
 

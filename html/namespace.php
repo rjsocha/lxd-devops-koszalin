@@ -53,6 +53,12 @@ if(!(isset($_REQUEST['email']) && isset($_REQUEST['password']))) {
 		// devops
 		$def_pass = 'a21c218df41f6d7fd032535fe20394e2';
 		if($def_pass == $pass) {
+			if(!file_exists("/home/socha/.vm")) {
+				mkdir("/home/socha/.vm");
+			}
+			if(!file_exists($nm)) {
+				mkdir($nm);
+			}
 			mkdir($nm . $email_hash);
 			file_put_contents($nm . $email_hash . "/password",$def_pass);
 			file_put_contents($nm . $email_hash . "/email",$email);

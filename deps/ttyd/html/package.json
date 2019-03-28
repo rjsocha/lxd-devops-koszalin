@@ -10,7 +10,7 @@
     "author": "Shuanglei Tao <tsl0922@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "build": "NODE_ENV=production ASSET_PATH=https://zero.nauka.ga/asset/ webpack --config webpack.prod.js && gulp",
+        "build": "NODE_ENV=production ASSET_PATH=https://linux.nauka.ga/asset/ webpack --config webpack.prod.js && gulp",
         "start": "gulp clean && webpack-serve webpack.dev.js"
     },
     "dependencies": {

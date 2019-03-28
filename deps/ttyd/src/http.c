@@ -119,9 +119,8 @@ callback_http(struct lws *wsi, enum lws_callback_reasons reason, void *user, voi
             const char* content_type = "text/html";
 	    const char* add_hdr_name1  = "X-Frame-Options:";
 	    const char* add_hdr_name2  = "Content-Security-Policy:";
-	    //const char* add_hdr_value1 = "ALLOW-FROM https://zero.nauka.ga/";
 	    const char* add_hdr_value1 = "SAMEORIGIN";
-	    const char* add_hdr_value2 = "frame-ancestors zero.nauka.ga";
+	    const char* add_hdr_value2 = "frame-ancestors linux.nauka.ga";
 
             if (server->index != NULL) {
                 int n = lws_serve_http_file(wsi, server->index, content_type, NULL, 0);

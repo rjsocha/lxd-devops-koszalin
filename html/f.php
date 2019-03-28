@@ -42,7 +42,7 @@ function get_pool($ns="") {
 	return $fvn;
 }
 function get_vm_info($vm) {
-	$last=exec('/home/socha/get_info ' . $vm,$out,$res);
+	$last=exec('/var/www/scripts/get_info ' . $vm,$out,$res);
 	if($res==0) {
 		return json_decode($last,TRUE);
 	}
