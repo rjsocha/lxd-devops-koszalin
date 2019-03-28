@@ -1,0 +1,14 @@
+<h5>Dodanie użytkownika do grupy <b>docker</b></h5>
+
+</br>
+
+$ <span class="paste-me" data-command-enter="sudo usermod -a -G docker $USER">sudo usermod -a -G docker $USER</span></br>
+
+</br>
+
+Aby aktualnemu użytkownikowi została przypisana grupa <b>docker</b> można albo się przelogować albo wykonać poniższe polecenia:
+</br>
+</br>
+$ <span class="paste-me" data-command-enter="exec newgrp docker">exec newgrp docker</span></br>
+$ <span class="paste-me" data-command-enter="exec newgrp $USER">exec newgrp $USER</span></br>
+$ <span class="paste-me" data-command-enter="id | grep docker --color">id | grep docker --color</span></br>
