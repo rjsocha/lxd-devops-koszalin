@@ -23,7 +23,7 @@ Dirty way, very dirty. Hardcoded paths, hardcoded username (socha)
 
 ```
 sudo apt-get install -y build-essential make git cmake libssl-dev zlib1g-dev libjson-c-dev pkg-config curl socat php-fpm  php-json  php-mbstring  php-xml  php-intl php-cli pwgen
-mkdir /var/www
+sudo mkdir /var/www && sudo chown socha.socha /var/www
 cd /var/www
 git clone git@github.com:rjsocha/lxd-devops-koszalin.git .
 sudo ln -s /var/www/system/systemd/ttyd@.service /etc/systemd/system/
